@@ -1,0 +1,2635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Protection Essentials | CyberTech</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="js/settings-manager.js"></script>
+    <script src="js/course-updater.js"></script>
+    <script src="js/direct-lesson-injector.js"></script>
+    
+    <!-- Video blocking script for data protection exercise -->
+    <script>
+        // Override video functions to block video for data protection exercise
+        const dataOriginalOpenVideoModal = window.openVideoModal;
+        const dataOriginalPlayVideo = window.playVideo;
+        const dataOriginalCreateElement = document.createElement;
+        
+        window.openVideoModal = function(title, videoId, duration) {
+            // Block video for data protection exercise
+            if (title === 'Interactive Exercise: Classifying Sample Data') {
+                console.log('🚫 Blocking video for data protection exercise:', title);
+                openDataExercise();
+                return;
+            }
+            
+            // Call original function for other lessons
+            if (dataOriginalOpenVideoModal) {
+                dataOriginalOpenVideoModal.apply(this, arguments);
+            }
+        };
+        
+        window.playVideo = function(videoId) {
+            // Block video playback for data protection exercise
+            if (videoId && videoId.includes('data') && videoId.includes('exercise')) {
+                console.log('🚫 Blocking video playback for data protection exercise');
+                openDataExercise();
+                return;
+            }
+            
+            // Call original function for other videos
+            if (dataOriginalPlayVideo) {
+                dataOriginalPlayVideo.apply(this, arguments);
+            }
+        };
+        
+        // Override createElement to prevent video creation for exercise
+        document.createElement = function(tagName) {
+            const element = dataOriginalCreateElement.call(document, tagName);
+            
+            if (tagName.toLowerCase() === 'video') {
+                // Check if we're in the context of the data protection exercise
+                const currentUrl = window.location.href;
+                if (currentUrl.includes('data-protection') || 
+                    document.querySelector('#data-exercise-lesson')) {
+                    console.log('🚫 Blocking video element creation for data protection exercise');
+                    // Return a dummy element instead
+                    const dummyElement = dataOriginalCreateElement.call(document, 'div');
+                    dummyElement.style.display = 'none';
+                    return dummyElement;
+                }
+            }
+            
+            return element;
+        };
+    </script>
+    <script>
+        // Make sure the course content is always up to date with admin changes
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update timestamp to refresh data without deleting courses
+            localStorage.setItem('cybertech_admin_courses_last_update', new Date().getTime().toString());
+            console.log('Updated timestamp to refresh course data without deleting existing courses');
+            
+            // Immediately check for template updates
+            if (typeof checkAndApplyTemplateUpdates === 'function') {
+                console.log('Checking for template updates on page load...');
+                checkAndApplyTemplateUpdates();
+            }
+            // Force refresh course data
+            if (localStorage.getItem('cybertech_admin_courses')) {
+                console.log('Loading latest course data from admin settings');
+                
+                // Set up a MutationObserver to detect when course content is updated
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'childList' && 
+                            (mutation.target.classList.contains('course-description') || 
+                             mutation.target.classList.contains('module-title') ||
+                             mutation.target.classList.contains('module-duration'))) {
+                            console.log('Course content updated by course-updater.js');
+                        }
+                    });
+                });
+                
+                // Observe the course description and module titles for changes
+                observer.observe(document.getElementById('main-course-description'), { childList: true, subtree: true });
+                document.querySelectorAll('.module-title, .module-duration').forEach(el => {
+                    observer.observe(el, { childList: true, subtree: true });
+                });
+                
+                // Update timestamp to refresh data without deleting courses
+                localStorage.setItem('cybertech_admin_courses_last_update', new Date().getTime().toString());
+                console.log('Updated timestamp to refresh course data without deleting existing courses');
+            }
+        });
+    </script>
+    <style>
+        /* Reading Modal Styles */
+        .reading-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            overflow: auto;
+        }
+        
+        .reading-modal-content {
+            position: relative;
+            background-color: #fff;
+            margin: 5% auto;
+            width: 90%;
+            max-width: 1200px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .reading-modal-header {
+            background-color: #4e54c8;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .reading-modal-header h3 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .reading-modal-close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .reading-modal-close:hover {
+            color: #ddd;
+        }
+        
+        .breach-scenarios-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .breach-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e9ecef;
+            position: relative;
+        }
+        
+        .breach-icon {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 40px;
+            height: 40px;
+            background: #4e54c8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .breach-card h4 {
+            margin: 0 0 15px 60px;
+            color: #333;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .breach-card p {
+            margin: 0 0 20px 60px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .example-box {
+            background: #f8f9fa;
+            border-left: 4px solid #4e54c8;
+            padding: 15px;
+            margin-left: 60px;
+            border-radius: 5px;
+        }
+        
+        .example-box h5 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .example-box h5 i {
+            color: #ffc107;
+        }
+        
+        .example-box p {
+            margin: 0;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Platform name styling for navigation and footer */
+        .platform-name-styled .cyber-part {
+            color: #4e54c8; /* Blue color */
+            font-weight: 600;
+        }
+        
+        .platform-name-styled .tech-part {
+            color: #43d477; /* Green color */
+            font-weight: 600;
+        }
+        
+        /* Navigation logo styling */
+        .navbar .logo h1 {
+            text-decoration: none;
+        }
+        
+        .navbar .logo h1 a {
+            text-decoration: none;
+        }
+        
+        .navbar .logo h1 .cyber-part {
+            color: #4e54c8; /* Blue color */
+            font-weight: 600;
+        }
+        
+        .navbar .logo h1 .tech-part {
+            color: #43d477; /* Green color */
+            font-weight: 600;
+        }
+        
+        /* Footer logo styling */
+        .footer-col h3 .cyber-part {
+            color: #4e54c8; /* Blue color */
+            font-weight: 600;
+        }
+        
+        .footer-col h3 .tech-part {
+            color: #43d477; /* Green color */
+            font-weight: 600;
+        }
+        
+        /* Reading lesson styles */
+        .lesson-expandable {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .lesson-expandable:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .expand-icon {
+            transition: transform 0.3s ease;
+            margin-left: auto;
+        }
+        
+        .lesson-expanded-content {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #6900cc;
+        }
+        
+        .breach-scenarios-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .breach-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #6900cc;
+        }
+        
+        .breach-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6900cc, #8f00b3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .breach-icon i {
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .breach-card h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .breach-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .example-box {
+            background: #e8f4fd;
+            border-radius: 6px;
+            padding: 15px;
+            border-left: 3px solid #007bff;
+        }
+        
+        .example-box h5 {
+            color: #007bff;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .example-box p {
+            color: #555;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1 class="platform-name-styled"><a href="index.html"><span class="cyber-part">Cyber</span><span class="tech-part">Tech</span></a></h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link-blue">Home</a></li>
+                <li><a href="index.html#courses" class="nav-link-green active">Courses</a></li>
+                <li><a href="about.html" class="nav-link-green">About</a></li>
+                <li><a href="contact.html" class="nav-link-blue">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Course Header -->
+    <section class="course-header">
+        <div class="container">
+            <div class="course-header-content">
+                <div class="course-badge intermediate small-badge">Intermediate</div>
+                <h1 id="course-title">Data Protection Essentials</h1>
+                <div class="course-meta">
+                    <span id="course-duration"><i class="fas fa-clock"></i> 3 hours</span>
+                    <span id="course-enrolled"><i class="fas fa-users"></i> 987 enrolled</span>
+                    <span><i class="fas fa-star"></i> 4.9 (142 reviews)</span>
+                    <span><i class="fas fa-certificate"></i> Certificate Included</span>
+                </div>
+                <p class="course-description" id="main-course-description">
+                    Learn comprehensive data protection strategies including data classification, encryption, backup procedures, and compliance requirements. This advanced course covers both personal and organizational data protection practices essential in today's digital landscape. You'll master techniques for identifying sensitive data, implementing appropriate security controls, and ensuring data integrity throughout its lifecycle. The course provides in-depth coverage of encryption technologies, secure storage solutions, and disaster recovery planning. You'll also gain expertise in navigating complex regulatory frameworks like GDPR, HIPAA, and CCPA, with practical guidance on implementing compliant data handling procedures. This knowledge is critical for anyone responsible for safeguarding valuable information assets.
+                </p>
+                <div class="course-actions">
+                    <a href="#overview" class="btn btn-primary" onclick="showTab('overview')">Start Learning</a>
+                    <a href="certificate.html" class="btn btn-secondary">Get the Certificate</a>
+                </div>
+
+                <script>
+                    function showTab(tabId) {
+                        // Hide all tab contents
+                        document.querySelectorAll('.tab-content').forEach(content => {
+                            content.classList.remove('active');
+                        });
+                        
+                        // Show selected tab content
+                        document.getElementById(tabId).classList.add('active');
+                        
+                        // Update tab buttons
+                        document.querySelectorAll('.tab-btn').forEach(btn => {
+                            btn.classList.remove('active');
+                            if(btn.getAttribute('data-tab') === tabId) {
+                                btn.classList.add('active');
+                            }
+                        });
+                    }
+                </script>
+            </div>
+            <div class="course-image">
+                <img src="images/Data Protection.jpg" alt="Data Protection" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>
+    </section>
+
+    <!-- Course Overview -->
+    <section class="course-overview" id="course-content">
+        <div class="container">
+            <div class="course-tabs">
+                <button class="tab-btn active" data-tab="overview">Overview</button>
+                <button class="tab-btn" data-tab="curriculum">Curriculum</button>
+                <button class="tab-btn" data-tab="reviews">Reviews</button>
+            </div>
+            
+            <div class="tab-content active" id="overview">
+                <h2>Course Overview</h2>
+                <p id="course-overview-text">
+                    Learn comprehensive data protection strategies including data classification, encryption, backup procedures, and compliance requirements. This advanced course covers both personal and organizational data protection practices essential in today's digital landscape. You'll master techniques for identifying sensitive data, implementing appropriate security controls, and ensuring data integrity throughout its lifecycle. The course provides in-depth coverage of encryption technologies, secure storage solutions, and disaster recovery planning. You'll also gain expertise in navigating complex regulatory frameworks like GDPR, HIPAA, and CCPA, with practical guidance on implementing compliant data handling procedures. This knowledge is critical for anyone responsible for safeguarding valuable information assets.
+                </p>
+                
+                <h3>What You Will Learn</h3>
+                <ul class="course-features">
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>Identify different types of sensitive data and their protection requirements</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>Implement data classification and handling procedures</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>Apply encryption and access controls to protect sensitive information</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>Understand key data protection regulations (GDPR, CCPA, etc.)</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>Respond effectively to data breaches and security incidents</span>
+                    </li>
+                </ul>
+                
+                <h3>Course Requirements</h3>
+                <ul class="requirements-list">
+                    <li>Basic understanding of cybersecurity concepts</li>
+                    <li>Completion of beginner-level cybersecurity courses recommended</li>
+                    <li>A computer with internet access</li>
+                </ul>
+                
+                <h3>Who This Course is For</h3>
+                <ul class="target-audience">
+                    <li>IT professionals responsible for data security</li>
+                    <li>Compliance officers and privacy managers</li>
+                    <li>Business owners handling customer data</li>
+                    <li>Employees who work with sensitive information</li>
+                </ul>
+            </div>
+            
+            <div class="tab-content" id="curriculum">
+                <h2>Course Curriculum</h2>
+                
+                <div class="course-module">
+                    <div class="module-header">
+                        <h3 class="module-title">Module 1: Data Protection Fundamentals</h3>
+                        <span class="module-length"><i class="fas fa-clock"></i> <span class="module-duration">35 minutes</span></span>
+                    </div>
+                    <div class="module-content">
+                        <ul class="module-lessons">
+                            <li>
+                                <div class="lesson-info video-lesson">
+                                    <i class="fas fa-play-circle"></i>
+                                    <span>Types of Sensitive Data</span>
+                                </div>
+                                <span class="lesson-length">12 min</span>
+                            </li>
+                            <li>
+                                <div class="lesson-info video-lesson">
+                                    <i class="fas fa-play-circle"></i>
+                                    <span>Principles of Data Protection</span>
+                                </div>
+                                <span class="lesson-length">13 min</span>
+                            </li>
+                            <li>
+                                <div class="lesson-info reading-lesson" onclick="openDataBreachModal()">
+                                    <i class="fas fa-file-alt" style="color: #e74c3c;"></i>
+                                    <span>Common Data Breach Scenarios</span>
+                                </div>
+                                <span class="lesson-length">10 min</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+
+
+                
+                <div class="course-module">
+                    <div class="module-header">
+                        <h3 class="module-title">Module 2: Technical Safeguards</h3>
+                        <span class="module-length"><i class="fas fa-clock"></i> <span class="module-duration">25 minutes</span></span>
+                    </div>
+                    <div class="module-content">
+                        <ul class="module-lessons">
+                            <li>
+                                <div class="lesson-info video-lesson">
+                                    <i class="fas fa-play-circle"></i>
+                                    <span>Data Encryption Fundamentals</span>
+                                </div>
+                                <span class="lesson-length">10 min</span>
+                            </li>
+                            <li>
+                                <div class="lesson-info video-lesson">
+                                    <i class="fas fa-play-circle"></i>
+                                    <span>Access Control Best Practices</span>
+                                </div>
+                                <span class="lesson-length">10 min</span>
+                            </li>
+                            <li>
+                                <div class="lesson-info exercise-lesson" id="data-exercise-lesson" style="cursor: pointer;" onclick="openDataExercise()">
+                                    <i class="fas fa-puzzle-piece" style="color: #e74c3c !important;"></i>
+                                    <span>Interactive Exercise: Classifying Sample Data</span>
+                                </div>
+                                <span class="lesson-length">10 min</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+
+            </div>
+            
+
+            
+            <div class="tab-content" id="reviews">
+                <h2>Student Reviews</h2>
+                
+                <!-- Review Form -->
+                <div class="review-form-container" id="reviewFormContainer">
+                    <h3>Rate This Course</h3>
+                    <p>Share your experience with CyberTech</p>
+                    
+                    <form id="reviewForm" class="review-form">
+                        <div class="rating-input">
+                            <p>Your Rating:</p>
+                            <div class="star-rating">
+                                <i class="far fa-star" data-rating="1"></i>
+                                <i class="far fa-star" data-rating="2"></i>
+                                <i class="far fa-star" data-rating="3"></i>
+                                <i class="far fa-star" data-rating="4"></i>
+                                <i class="far fa-star" data-rating="5"></i>
+                                <input type="hidden" name="rating" id="selectedRating" value="0">
+                            </div>
+                        </div>
+                        
+                        <div class="comment-input">
+                            <label for="reviewComment">Your Comment (Optional):</label>
+                            <textarea id="reviewComment" name="comment" rows="4" placeholder="Share your thoughts about this course..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                    </form>
+                </div>
+                
+                <div class="review-summary">
+                    <div class="review-average">
+                        <span class="rating">4.6</span>
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <span class="total-reviews">156 reviews</span>
+                    </div>
+                    <div class="rating-bars">
+                        <div class="rating-bar">
+                            <span class="rating-label">5 stars</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 70%;"></div>
+                            </div>
+                            <span class="rating-percent">70%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <span class="rating-label">4 stars</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 25%;"></div>
+                            </div>
+                            <span class="rating-percent">25%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <span class="rating-label">3 stars</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 3%;"></div>
+                            </div>
+                            <span class="rating-percent">3%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <span class="rating-label">2 stars</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 1%;"></div>
+                            </div>
+                            <span class="rating-percent">1%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <span class="rating-label">1 star</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 1%;"></div>
+                            </div>
+                            <span class="rating-percent">1%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="review-list" id="review-page-1">
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Thomas Wright</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">1 week ago</span>
+                        </div>
+                        <p class="review-text">
+                            As a compliance manager, this course was exactly what I needed. The regulatory section was particularly helpful in understanding GDPR and CCPA implications.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Sophia Martinez</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">3 weeks ago</span>
+                        </div>
+                        <p class="review-text">
+                            The technical safeguards module was excellent - it explained encryption concepts in a way that was accessible without oversimplifying.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Daniel Kim</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="review-date">1 month ago</span>
+                        </div>
+                        <p class="review-text">
+                            Good course overall. The data classification exercise was very practical, and I've already started applying those principles at work.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="review-list" id="review-page-2" style="display: none;">
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Jennifer Lee</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">1.5 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            The section on data classification frameworks was incredibly useful. It provided a clear structure for organizing our sensitive information.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Robert Chen</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="review-date">2 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            Comprehensive coverage of data protection principles. The practical examples made complex concepts easy to understand.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Laura Thompson</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">2.5 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            The compliance documentation templates have been invaluable for our organization. Well-structured and thorough content.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="review-list" id="review-page-3" style="display: none;">
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Mark Wilson</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">3 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            Excellent coverage of access control best practices. The section on encryption fundamentals was particularly well-explained.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Emily Davis</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">3.5 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            The interactive exercises helped reinforce the learning. Great balance of theory and practical application.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Michael Park</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="review-date">4 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            Solid foundation in data protection principles. The course provides practical tools for implementing security measures.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="review-list" id="review-page-4" style="display: none;">
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Sarah Anderson</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">4.5 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            The regulatory compliance section was comprehensive and up-to-date. Very relevant for today's privacy landscape.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>James Rodriguez</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="review-date">5 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            Well-structured content with clear examples. The data breach response procedures were particularly valuable.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Lisa Kim</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">5.5 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            The course exceeded expectations. Excellent coverage of both technical and procedural aspects of data protection.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="review-pagination">
+                    <div class="pagination-dots">
+                        <span class="dot active" onclick="showReviewPage(1)"></span>
+                        <span class="dot" onclick="showReviewPage(2)"></span>
+                        <span class="dot" onclick="showReviewPage(3)"></span>
+                        <span class="dot" onclick="showReviewPage(4)"></span>
+                    </div>
+                </div>
+
+                <script>
+                    function showReviewPage(pageNumber) {
+                        // Hide all review pages
+                        document.querySelectorAll('.review-list').forEach(page => {
+                            page.style.display = 'none';
+                        });
+                        
+                        // Show selected page
+                        document.getElementById('review-page-' + pageNumber).style.display = 'block';
+                        
+                        // Update active dot
+                        document.querySelectorAll('.dot').forEach(dot => {
+                            dot.classList.remove('active');
+                        });
+                        document.querySelectorAll('.dot')[pageNumber - 1].classList.add('active');
+                    }
+                </script>
+                <style>
+                    .pagination-dots {
+                        display: flex;
+                        justify-content: center;
+                        gap: 8px;
+                        margin: 20px 0;
+                    }
+                    .pagination-dots .dot {
+                        width: 12px;
+                        height: 12px;
+                        background-color: #FFE600;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        transition: background-color 0.3s ease;
+                    }
+                    .pagination-dots .dot.active {
+                        background-color: #FF0000;
+                    }
+                </style>
+            </div>
+        </div>
+    </section>
+
+    <!-- Related Courses -->
+    <section class="related-courses">
+        <div class="container">
+            <h2>Related Courses</h2>     
+                <div class="course-card">
+                    <div class="course-image">
+                        <img src="images/Social Enginner.jpg" alt="Social Engineering">
+                        <div class="course-badge intermediate">Intermediate</div>
+                    </div>
+                    <div class="course-content">
+                        <h3>Social Engineering Defense</h3>
+                        <p>Understand and defend against social engineering attacks and manipulation techniques.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 2.5 hours</span>
+                            <span><i class="fas fa-users"></i> 756 enrolled</span>
+                        </div>
+                        <a href="course-social-engineering.html" class="btn btn-course">Start Course</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enrollment CTA -->
+    <section class="course-cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to enhance your data protection skills?</h2>
+                <p>Join 987+ professionals who have already completed this course</p>
+                <a href="#course-content" class="btn btn-cta">Enroll Now</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3 class="platform-name-styled"><span class="cyber-part">Cyber</span><span class="tech-part">Tech</span></h3>
+                    <p class="platform-description">An interactive cybersecurity awareness platform designed to empower employees with practical skills to navigate the digital world safely.</p>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/profile.php?id=61578401008909"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://www.instagram.com/noor.dmin/?igsh=cnp1d2l3cHp6eTdn#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#courses">Courses</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Courses</h4>
+                    <ul>
+                        <li><a href="course-phishing.html">Phishing Awareness</a></li>
+                        <li><a href="course-password-security.html">Password Security</a></li>
+                        <li><a href="course-data-protection.html">Data Protection</a></li>
+                        <li><a href="course-social-engineering.html">Social Engineering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact Us</h4>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Cyber Street, Tech City</li>
+                        <li><i class="fas fa-phone"></i> +44 20 7123 4567</li>
+                        <li><i class="fas fa-envelope"></i> Admin@cybertech.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 <span class="platform-name platform-name-styled"><span class="cyber-part">Cyber</span><span class="tech-part">Tech</span></span>. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    
+    <style>
+        /* Review Form Styles */
+        .review-form-container {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .review-form-container h3 {
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .review-form-container p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .review-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .rating-input p {
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .star-rating {
+            display: flex;
+            gap: 5px;
+            font-size: 24px;
+            color: #ffc107;
+            cursor: pointer;
+        }
+        
+        .star-rating i:hover,
+        .star-rating i.fas {
+            color: #ffc107;
+        }
+        
+        .comment-input label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .comment-input textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .review-form button {
+            align-self: flex-start;
+            padding: 10px 20px;
+        }
+        
+        .review-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+    
+    <script>
+        // Function to update styled platform names
+        function updateStyledPlatformNames() {
+            // Get platform name from settings manager if available
+            let platformName = 'CyberTech'; // Default
+            if (window.SettingsManager && window.SettingsManager.getPlatformInfo) {
+                const platformInfo = window.SettingsManager.getPlatformInfo();
+                if (platformInfo && platformInfo.platformName) {
+                    platformName = platformInfo.platformName;
+                }
+            }
+            
+            // Find all platform-name-styled elements
+            const styledElements = document.querySelectorAll('.platform-name-styled');
+            
+            styledElements.forEach(element => {
+                // Split the platform name - first part is "Cyber" in blue, rest is in green
+                let nameParts = platformName.split(/\s+/);
+                let firstPart = 'Cyber';
+                let restPart = 'Tech';
+                
+                if (nameParts.length >= 1) {
+                    firstPart = nameParts[0];
+                    restPart = nameParts.slice(1).join(' ');
+                    
+                    // If there's only one word, use first 5 chars as first part and rest as second part
+                    if (restPart === '' && firstPart.length > 5) {
+                        restPart = firstPart.substring(5);
+                        firstPart = firstPart.substring(0, 5);
+                    } else if (restPart === '') {
+                        restPart = 'Tech'; // Default second part if first part is short
+                    }
+                }
+                
+                // Update the HTML
+                element.innerHTML = `<span class="cyber-part">${firstPart}</span><span class="tech-part">${restPart}</span>`;
+            });
+            
+            // Update regular platform name elements
+            const platformElements = document.querySelectorAll('.platform-name:not(.platform-name-styled)');
+            platformElements.forEach(element => {
+                element.textContent = platformName;
+            });
+        }
+        
+        // Run when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update styled platform names
+            updateStyledPlatformNames();
+            
+            // Listen for settings changes
+            document.addEventListener('settingsChanged', function() {
+                updateStyledPlatformNames();
+            });
+            
+            // Initialize tab functionality
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    showTab(tabId);
+                });
+            });
+            
+            // Function to show the selected tab
+            function showTab(tabId) {
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show selected tab content
+                document.getElementById(tabId).classList.add('active');
+                
+                // Update tab buttons
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if(btn.getAttribute('data-tab') === tabId) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+            
+            // Review Form Functionality
+            // Check if user has already submitted a review for this course
+            const hasReviewed = false; // Always allow reviews
+            const reviewForm = document.getElementById('reviewFormContainer');
+            
+            if (hasReviewed) {
+                // Replace form with thank you message
+                reviewForm.innerHTML = `
+                    <div class="review-success">
+                        <i class="fas fa-check-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                        <h3>Thank You for Your Feedback!</h3>
+                        <p>Your review has been submitted successfully and sent to CyberTech admin.</p>
+                    </div>
+                `;
+            } else {
+                // Star rating functionality
+                const stars = document.querySelectorAll('.star-rating i');
+                const ratingInput = document.getElementById('selectedRating');
+                
+                stars.forEach(star => {
+                    star.addEventListener('mouseover', function() {
+                        const rating = this.dataset.rating;
+                        highlightStars(rating);
+                    });
+                    
+                    star.addEventListener('mouseout', function() {
+                        const currentRating = ratingInput.value;
+                        highlightStars(currentRating);
+                    });
+                    
+                    star.addEventListener('click', function() {
+                        const rating = this.dataset.rating;
+                        ratingInput.value = rating;
+                        highlightStars(rating);
+                    });
+                });
+                
+                function highlightStars(rating) {
+                    stars.forEach(star => {
+                        if (star.dataset.rating <= rating) {
+                            star.classList.remove('far');
+                            star.classList.add('fas');
+                        } else {
+                            star.classList.remove('fas');
+                            star.classList.add('far');
+                        }
+                    });
+                }
+                
+                // Form submission
+                const form = document.getElementById('reviewForm');
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const rating = ratingInput.value;
+                    const comment = document.getElementById('reviewComment').value;
+                    
+                    if (rating === '0') {
+                        alert('Please select a rating before submitting.');
+                        return;
+                    }
+                    
+                    // Get logged-in user information
+                    const currentUser = JSON.parse(localStorage.getItem('cybertech_user') || '{}');
+                    const userName = currentUser.username || currentUser.name || 'Anonymous User';
+                    const userEmail = currentUser.email || 'No email provided';
+                    
+                    // Submit review using the global function to ensure it appears at the top for admin
+                    if (typeof submitUserReview === 'function') {
+                        submitUserReview(userName, userEmail, 'data', rating, comment || 'No comment provided');
+                    } else {
+                        // Fallback if submitUserReview function is not available
+                        const feedbackData = {
+                            name: userName,
+                            email: userEmail,
+                            course: 'data',
+                            rating: rating,
+                            comment: comment || 'No comment provided',
+                            timestamp: new Date().toISOString(),
+                            isNewUserReview: true
+                        };
+                        
+                        // Send to admin feedback system
+                        const existingFeedback = JSON.parse(localStorage.getItem('cybertech_feedback') || '[]');
+                        existingFeedback.unshift(feedbackData); // Add to beginning
+                        localStorage.setItem('cybertech_feedback', JSON.stringify(existingFeedback));
+                        
+                        // Store for cross-page communication
+                        localStorage.setItem('new_user_review', JSON.stringify(feedbackData));
+                    }
+                    
+                    // Show thank you message temporarily
+                    reviewForm.innerHTML = `
+                        <div class="review-success">
+                            <i class="fas fa-check-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                            <h3>Thank You for Your Feedback!</h3>
+                            <p>Your review has been submitted successfully and sent to CyberTech admin.</p>
+                        </div>
+                    `;
+                    
+                    // After 5 seconds, show the review form again
+                    setTimeout(() => {
+                        // Reset the form
+                        reviewForm.innerHTML = `
+                            <h3>Rate This Course</h3>
+                            <p>Share your experience with CyberTech</p>
+                            
+                            <form id="reviewForm" class="review-form">
+                                <div class="rating-input">
+                                    <p>Your Rating:</p>
+                                    <div class="star-rating">
+                                        <i class="far fa-star" data-rating="1"></i>
+                                        <i class="far fa-star" data-rating="2"></i>
+                                        <i class="far fa-star" data-rating="3"></i>
+                                        <i class="far fa-star" data-rating="4"></i>
+                                        <i class="far fa-star" data-rating="5"></i>
+                                        <input type="hidden" name="rating" id="selectedRating" value="0">
+                                    </div>
+                                </div>
+                                
+                                <div class="comment-input">
+                                    <label for="reviewComment">Your Comment (Optional):</label>
+                                    <textarea id="reviewComment" name="comment" rows="4" placeholder="Share your thoughts about this course..."></textarea>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">Submit Review</button>
+                            </form>
+                        `;
+                        
+                        // Reinitialize the star rating functionality
+                        const newStars = document.querySelectorAll('.star-rating i');
+                        const newRatingInput = document.getElementById('selectedRating');
+                        
+                        newStars.forEach(star => {
+                            star.addEventListener('mouseover', function() {
+                                const rating = this.dataset.rating;
+                                highlightStars(rating);
+                            });
+                            
+                            star.addEventListener('mouseout', function() {
+                                const currentRating = newRatingInput.value;
+                                highlightStars(currentRating);
+                            });
+                            
+                            star.addEventListener('click', function() {
+                                const rating = this.dataset.rating;
+                                newRatingInput.value = rating;
+                                highlightStars(rating);
+                            });
+                        });
+                        
+                        // Reattach the form submission event
+                        const newForm = document.getElementById('reviewForm');
+                        if (newForm) {
+                            newForm.addEventListener('submit', arguments.callee);
+                        }
+                    }, 5000); // 5 seconds
+                });
+            }
+        });
+        
+        // Function to toggle data protection methods
+        function toggleDataMethods(element) {
+            const content = element.nextElementSibling;
+            const expandIcon = element.querySelector('.expand-icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                expandIcon.classList.add('rotate');
+                expandIcon.style.transform = 'rotate(180deg)';
+            } else {
+                content.style.display = 'none';
+                expandIcon.classList.remove('rotate');
+                expandIcon.style.transform = 'rotate(0deg)';
+            }
+        }
+    </script>
+
+    <!-- Data Breach Modal -->
+    <div id="dataBreachModal" class="reading-modal">
+        <div class="reading-modal-content">
+            <div class="reading-modal-header">
+                <h3>Common Data Breach Scenarios</h3>
+                <span class="reading-modal-close" onclick="closeDataBreachModal()">&times;</span>
+            </div>
+            <div class="breach-scenarios-container">
+                <div class="breach-card">
+                    <div class="breach-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h4>Phishing Attacks</h4>
+                    <p>Attackers send fraudulent emails that appear to come from legitimate sources, tricking users into revealing sensitive information or clicking malicious links.</p>
+                    <div class="example-box">
+                        <h5><i class="fas fa-info-circle"></i> Example:</h5>
+                        <p>An email claiming to be from your bank asking you to verify your account details by clicking a link.</p>
+                    </div>
+                </div>
+                
+                <div class="breach-card">
+                    <div class="breach-icon">
+                        <i class="fas fa-user-secret"></i>
+                    </div>
+                    <h4>Insider Threats</h4>
+                    <p>Current or former employees, contractors, or business partners who have access to sensitive data and misuse it intentionally or accidentally.</p>
+                    <div class="example-box">
+                        <h5><i class="fas fa-info-circle"></i> Example:</h5>
+                        <p>An employee copying customer data to a personal device before leaving the company.</p>
+                    </div>
+                </div>
+                
+                <div class="breach-card">
+                    <div class="breach-icon">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <h4>Software Vulnerabilities</h4>
+                    <p>Security flaws in software applications that allow attackers to gain unauthorized access to systems and data.</p>
+                    <div class="example-box">
+                        <h5><i class="fas fa-info-circle"></i> Example:</h5>
+                        <p>Outdated software with known security holes that haven't been patched.</p>
+                    </div>
+                </div>
+                
+                <div class="breach-card">
+                    <div class="breach-icon">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <h4>Unsecured Networks</h4>
+                    <p>Data transmitted over public or unsecured Wi-Fi networks can be intercepted by attackers using packet sniffing tools.</p>
+                    <div class="example-box">
+                        <h5><i class="fas fa-info-circle"></i> Example:</h5>
+                        <p>Accessing company email over public Wi-Fi at a coffee shop without using a VPN.</p>
+                    </div>
+                </div>
+                
+                <div class="breach-card">
+                    <div class="breach-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h4>Lost or Stolen Devices</h4>
+                    <p>Physical devices containing sensitive data that are lost, stolen, or improperly disposed of without proper data wiping.</p>
+                    <div class="example-box">
+                        <h5><i class="fas fa-info-circle"></i> Example:</h5>
+                        <p>A laptop with customer information left in a taxi or stolen from a car.</p>
+                    </div>
+                </div>
+                
+                <div class="breach-card">
+                    <div class="breach-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h4>Database Attacks</h4>
+                    <p>Direct attacks on databases through SQL injection, weak authentication, or misconfigured security settings.</p>
+                    <div class="example-box">
+                        <h5><i class="fas fa-info-circle"></i> Example:</h5>
+                        <p>SQL injection attacks that allow attackers to extract or modify database records.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="video-modal">
+        <div class="video-modal-content">
+            <div class="video-modal-header">
+                <h3 id="videoTitle">Video Title</h3>
+                <span class="close-video-modal" onclick="closeVideoModal()">&times;</span>
+            </div>
+            <div class="video-modal-body">
+                <div class="video-container">
+                    <video id="courseVideo" controls preload="metadata">
+                        <source src="" type="video/mp4">
+                        <p>Your browser does not support the video tag.</p>
+                    </video>
+                </div>
+                <div class="video-info">
+                    <p id="videoDuration">Duration: <span id="durationText">0 min</span></p>
+                    <p>Click play to start the lesson. You can pause and resume at any time.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    
+    <style>
+        /* Video Modal Styles */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow: auto;
+        }
+        
+        .video-modal-content {
+            position: relative;
+            background-color: #fff;
+            margin: 5% auto;
+            width: 80%;
+            max-width: 900px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .video-modal-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .video-modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+        
+        .close-video-modal {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close-video-modal:hover {
+            color: #ddd;
+        }
+        
+        .video-modal-body {
+            padding: 0;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            background-color: #000;
+        }
+        
+        .video-container video {
+            width: 100%;
+            display: block;
+        }
+        
+        .video-info {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .video-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+        
+        /* Video Lesson Style */
+        .video-lesson {
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .video-lesson:hover {
+            background-color: rgba(78, 84, 200, 0.1);
+        }
+        
+        .video-lesson .fas {
+            color: #e74c3c;
+        }
+    </style>
+    
+    <script>
+        // Override openVideoModal to block video for reading lessons
+        const originalOpenVideoModal = window.openVideoModal;
+        window.openVideoModal = function(title, videoId, duration) {
+            // Block video for reading lessons
+            if (title === 'Common Data Breach Scenarios') {
+                console.log('🚫 Blocking video for reading lesson:', title);
+                openDataBreachModal();
+                return;
+            }
+            
+            // Call original function for other lessons
+            if (originalOpenVideoModal) {
+                originalOpenVideoModal.apply(this, arguments);
+            }
+        };
+        
+        // Video Modal Functions
+        function openVideoModal(title, videoId, duration) {
+            const modal = document.getElementById('videoModal');
+            const videoTitle = document.getElementById('videoTitle');
+            const durationText = document.getElementById('durationText');
+            const video = document.getElementById('courseVideo');
+            
+            // Set video details
+            videoTitle.textContent = title;
+            durationText.textContent = duration + ' min';
+            
+            console.log('Looking for video with title:', title);
+            
+            // Try to load video from user videos (uploaded by admin)
+            const userVideos = JSON.parse(localStorage.getItem('cybertech_user_videos') || '[]');
+            console.log('Available user videos:', userVideos);
+            
+            // PRIORITIZE UPLOADED VIDEOS OVER SAMPLE VIDEOS
+            
+            // Strategy 1: Find uploaded videos with exact title match
+            let matchedVideo = userVideos.find(v => 
+                v.isUploadedFile === true &&
+                v.title.toLowerCase() === title.toLowerCase()
+            );
+            
+            // Strategy 2: Find uploaded videos with partial title match
+            if (!matchedVideo) {
+                matchedVideo = userVideos.find(v => 
+                    v.isUploadedFile === true &&
+                    (v.title.toLowerCase().includes(title.toLowerCase()) ||
+                     title.toLowerCase().includes(v.title.toLowerCase()))
+                );
+            }
+            
+            // Strategy 3: Find any uploaded video for this course
+            if (!matchedVideo) {
+                matchedVideo = userVideos.find(v => 
+                    v.isUploadedFile === true &&
+                    v.courseName && v.courseName.toLowerCase().includes('data protection')
+                );
+            }
+            
+            // Strategy 4: Find any uploaded video at all
+            if (!matchedVideo) {
+                matchedVideo = userVideos.find(v => v.isUploadedFile === true);
+            }
+            
+            // FALLBACK TO SAMPLE VIDEOS ONLY IF NO UPLOADED VIDEOS EXIST
+            
+            // Strategy 5: Sample videos - exact title match
+            if (!matchedVideo) {
+                matchedVideo = userVideos.find(v => 
+                    v.title.toLowerCase() === title.toLowerCase()
+                );
+            }
+            
+            // Strategy 6: Sample videos - partial title match
+            if (!matchedVideo) {
+                matchedVideo = userVideos.find(v => 
+                    v.title.toLowerCase().includes(title.toLowerCase()) ||
+                    title.toLowerCase().includes(v.title.toLowerCase())
+                );
+            }
+            
+            // Strategy 7: Sample videos - lesson name match
+            if (!matchedVideo) {
+                matchedVideo = userVideos.find(v => 
+                    v.lessonName && v.lessonName.toLowerCase().includes(title.toLowerCase())
+                );
+            }
+            
+            // Strategy 8: Sample videos - any from this course
+            if (!matchedVideo) {
+                matchedVideo = userVideos.find(v => 
+                    v.courseName && v.courseName.toLowerCase().includes('data protection')
+                );
+            }
+            
+            console.log('Matched video:', matchedVideo);
+            
+            if (matchedVideo && matchedVideo.videoUrl) {
+                if (matchedVideo.isUploadedFile) {
+                    console.log('✅ USING ADMIN UPLOADED VIDEO:', matchedVideo.title);
+                } else {
+                    console.log('⚠️ Using sample video:', matchedVideo.title);
+                }
+                
+                // Set video source
+                video.src = matchedVideo.videoUrl;
+            } else {
+                // Fallback to default video
+                console.log('⚠️ No matching video found, using default sample');
+                video.src = 'https://www.w3schools.com/html/mov_bbb.mp4';
+            }
+            
+            // Show modal
+            modal.style.display = 'block';
+            
+            // Try to autoplay
+            video.play().catch(e => {
+                console.log('Autoplay prevented:', e);
+            });
+        }
+        
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            const video = document.getElementById('courseVideo');
+            
+            // Pause and reset video
+            video.pause();
+            video.currentTime = 0;
+            
+            // Hide modal
+            modal.style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const videoModal = document.getElementById('videoModal');
+            const dataBreachModal = document.getElementById('dataBreachModal');
+            
+            if (event.target === videoModal) {
+                closeVideoModal();
+            } else if (event.target === dataBreachModal) {
+                closeDataBreachModal();
+            }
+        }
+        
+        // Listen for template updates
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'cybertech_overview_templates_last_update') {
+                console.log('Template updates detected, refreshing course content...');
+                setTimeout(() => {
+                    if (typeof checkAndApplyTemplateUpdates === 'function') {
+                        checkAndApplyTemplateUpdates();
+                    }
+                }, 500);
+            }
+        });
+        
+        // Function to open data breach modal
+        function openDataBreachModal() {
+            console.log('🎯 Opening data breach modal');
+            const modal = document.getElementById('dataBreachModal');
+            if (modal) {
+                modal.style.display = 'block';
+                modal.style.visibility = 'visible';
+                modal.style.opacity = '1';
+                modal.style.zIndex = '1000';
+                console.log('✅ Opened data breach modal');
+            } else {
+                console.error('❌ Data breach modal not found');
+            }
+        }
+
+        // Function to close data breach modal
+        function closeDataBreachModal() {
+            console.log('🎯 Closing data breach modal');
+            const modal = document.getElementById('dataBreachModal');
+            if (modal) {
+                modal.style.display = 'none';
+                console.log('✅ Closed data breach modal');
+            }
+        }
+
+        // Make functions globally accessible
+        window.openDataBreachModal = openDataBreachModal;
+        window.closeDataBreachModal = closeDataBreachModal;
+        
+        // Also make them available on the global scope
+        if (typeof window !== 'undefined') {
+            window.openDataBreachModal = openDataBreachModal;
+            window.closeDataBreachModal = closeDataBreachModal;
+        }
+
+        // Function to toggle reading lesson content
+        function toggleReadingLesson(element) {
+            const content = element.nextElementSibling;
+            const expandIcon = element.querySelector('.expand-icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                expandIcon.classList.add('rotate');
+                expandIcon.style.transform = 'rotate(180deg)';
+            } else {
+                content.style.display = 'none';
+                expandIcon.classList.remove('rotate');
+                expandIcon.style.transform = 'rotate(0deg)';
+            }
+        }
+        
+        // Block video functionality for reading lessons
+        function blockVideoForReadingLessons() {
+            const readingLessons = document.querySelectorAll('.lesson-info');
+            readingLessons.forEach(lesson => {
+                const title = lesson.querySelector('span')?.textContent;
+                if (title === 'Common Data Breach Scenarios') {
+                    // Remove video classes
+                    lesson.classList.remove('video-lesson');
+                    lesson.classList.remove('lesson-expandable');
+                    
+                    // Add reading class
+                    lesson.classList.add('reading-lesson');
+                    
+                    // Update icon
+                    const icon = lesson.querySelector('i:first-child');
+                    if (icon) {
+                        icon.className = 'fas fa-file-alt';
+                        icon.style.color = '#e74c3c';
+                    }
+                    
+                    // Remove expand icon if exists
+                    const expandIcon = lesson.querySelector('.expand-icon');
+                    if (expandIcon) {
+                        expandIcon.remove();
+                    }
+                    
+                    // Set onclick to open modal
+                    lesson.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openDataBreachModal();
+                    };
+                    
+                    // Remove expanded content if exists
+                    const expandedContent = lesson.nextElementSibling;
+                    if (expandedContent && expandedContent.classList.contains('lesson-expanded-content')) {
+                        expandedContent.remove();
+                    }
+                }
+            });
+        }
+        
+        // Ensure reading lessons are properly configured
+        function ensureReadingLessons() {
+            const readingLessons = [
+                'Common Data Breach Scenarios'
+            ];
+            
+            readingLessons.forEach(lessonTitle => {
+                const lessonElement = Array.from(document.querySelectorAll('.lesson-info')).find(el => 
+                    el.textContent.includes(lessonTitle)
+                );
+                
+                if (lessonElement) {
+                    // Remove video classes
+                    lessonElement.classList.remove('video-lesson');
+                    lessonElement.classList.remove('lesson-expandable');
+                    
+                    // Add reading class
+                    lessonElement.classList.add('reading-lesson');
+                    
+                    // Update icon
+                    const icon = lessonElement.querySelector('i:first-child');
+                    if (icon) {
+                        icon.className = 'fas fa-file-alt';
+                        icon.style.color = '#e74c3c';
+                    }
+                    
+                    // Remove expand icon if exists
+                    const expandIcon = lessonElement.querySelector('.expand-icon');
+                    if (expandIcon) {
+                        expandIcon.remove();
+                    }
+                    
+                    // Set onclick to open modal
+                    lessonElement.onclick = function() { openDataBreachModal(); };
+                    
+                    // Remove expanded content if exists
+                    const expandedContent = lessonElement.nextElementSibling;
+                    if (expandedContent && expandedContent.classList.contains('lesson-expanded-content')) {
+                        expandedContent.remove();
+                    }
+                }
+            });
+        }
+        
+        // Setup reading lesson observer
+        function setupReadingLessonObserver() {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList') {
+                        ensureReadingLessons();
+                    }
+                });
+            });
+            
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        }
+        
+        // Function to dynamically rebuild the entire course structure from admin data
+        function updateCourseModules() {
+            console.log('🔄 Rebuilding Data Protection course structure from admin data...');
+            
+            const courses = JSON.parse(localStorage.getItem('cybertech_admin_courses') || '[]');
+            const dataCourse = courses.find(c => c.id === 4);
+            
+            if (dataCourse && dataCourse.modules) {
+                console.log('Found Data Protection course:', dataCourse.modules);
+                
+                // Get the course content container
+                const mainContent = document.querySelector('#curriculum');
+                if (!mainContent) {
+                    console.error('❌ Course content container not found');
+                    return;
+                }
+                
+                // Clear existing content but preserve the heading
+                const heading = mainContent.querySelector('h2');
+                mainContent.innerHTML = '';
+                if (heading) {
+                    mainContent.appendChild(heading);
+                }
+                
+                // Build modules dynamically
+                dataCourse.modules.forEach((module, index) => {
+                    const moduleDiv = document.createElement('div');
+                    moduleDiv.className = 'course-module';
+                    
+                    const moduleHTML = `
+                        <div class="module-header">
+                            <h3 class="module-title">Module ${index + 1}: ${module.title}</h3>
+                            <span class="module-length"><i class="fas fa-clock"></i> <span class="module-duration">${module.duration}</span></span>
+                        </div>
+                        <div class="module-content">
+                            <ul class="module-lessons">
+                                ${module.lessons.map(lesson => `
+                                    <li>
+                                        <div class="lesson-info ${lesson.title === 'Common Data Breach Scenarios' ? 'reading-lesson' : lesson.type === 'interactive' ? '' : 'video-lesson'}" 
+                                             ${lesson.title === 'Common Data Breach Scenarios' ? 'onclick="openDataBreachModal()"' : lesson.type === 'interactive' ? 'id="data-exercise-lesson" style="cursor: pointer;"' : ''}>
+                                            <i class="fas ${lesson.title === 'Common Data Breach Scenarios' ? 'fa-file-alt' : lesson.type === 'interactive' ? 'fa-puzzle-piece' : 'fa-play-circle'}" ${lesson.title === 'Common Data Breach Scenarios' ? 'style="color: #e74c3c;"' : ''}></i>
+                                            <span>${lesson.title}</span>
+                                        </div>
+                                        <span class="lesson-length">${lesson.duration}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                    
+                    moduleDiv.innerHTML = moduleHTML;
+                    mainContent.appendChild(moduleDiv);
+                    console.log(`✅ Added module: ${module.title}`);
+                });
+                
+                // Re-attach event listeners
+                const videoLessons = mainContent.querySelectorAll('.video-lesson');
+                videoLessons.forEach(lesson => {
+                    const title = lesson.querySelector('span').textContent;
+                    
+                    // Skip data breach lesson - it should open modal, not video
+                    if (title === 'Common Data Breach Scenarios') {
+                        lesson.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openDataBreachModal();
+                        });
+                    } else {
+                        lesson.addEventListener('click', function() {
+                            const duration = this.closest('li').querySelector('.lesson-length').textContent;
+                            openVideoModal(title, null, duration);
+                        });
+                    }
+                });
+                
+                const exerciseLessons = mainContent.querySelectorAll('#data-exercise-lesson');
+                exerciseLessons.forEach(lesson => {
+                    lesson.addEventListener('click', openDataExercise);
+                });
+                
+                const readingLessons = mainContent.querySelectorAll('.lesson-expandable');
+                readingLessons.forEach(lesson => {
+                    lesson.addEventListener('click', function() {
+                        toggleReadingLesson(this);
+                    });
+                });
+                
+                console.log('✅ Course structure rebuilt successfully');
+            } else {
+                console.log('❌ Data Protection course not found in admin data');
+            }
+        }
+
+        // Initialize reading lesson functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update course modules from admin data
+            updateCourseModules();
+            
+            // Set up periodic refresh of course modules
+            setInterval(updateCourseModules, 5000);
+            
+            // Listen for admin course updates
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'cybertech_admin_courses' || e.key === 'cybertech_admin_courses_last_update') {
+                    console.log('Admin course data updated, refreshing modules...');
+                    setTimeout(updateCourseModules, 1000);
+                }
+            });
+            
+            ensureReadingLessons();
+            setupReadingLessonObserver();
+            blockVideoForReadingLessons();
+        });
+    </script>
+
+    <!-- Data Protection Exercise Modal -->
+    <div id="dataExerciseModal" class="exercise-modal">
+        <div class="exercise-modal-content">
+            <div class="exercise-modal-header">
+                <h2>Interactive Exercise: Classifying Sample Data</h2>
+                <span class="exercise-modal-close" onclick="closeDataExercise()">&times;</span>
+            </div>
+            
+            <!-- Exercise Intro -->
+            <div id="dataExerciseIntro" class="exercise-section">
+                <div class="exercise-intro-content">
+                    <div class="exercise-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Test Your Data Classification Knowledge</h3>
+                    <p>You'll be shown 10 different data scenarios. Your task is to identify the appropriate data classification level for each type of information.</p>
+                    
+                    <div class="exercise-instructions">
+                        <h4>Consider these factors:</h4>
+                        <ul>
+                            <li>Sensitivity of the information</li>
+                            <li>Potential impact if compromised</li>
+                            <li>Required access restrictions</li>
+                            <li>Regulatory requirements</li>
+                            <li>Business value of the data</li>
+                        </ul>
+                    </div>
+                    
+                    <button onclick="startDataExercise()" class="btn btn-primary">Start Exercise</button>
+                </div>
+            </div>
+            
+            <!-- Exercise Questions -->
+            <div id="dataExerciseQuestions" class="exercise-section" style="display: none;">
+                <!-- Questions will be dynamically inserted here -->
+            </div>
+            
+            <!-- Exercise Results -->
+            <div id="dataExerciseResults" class="exercise-section" style="display: none;">
+                <div class="exercise-results-content">
+                    <div class="exercise-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3>Exercise Complete!</h3>
+                    
+                    <div class="score-display">
+                        <div class="score-number">
+                            <span id="dataScoreDisplay">0/10</span>
+                        </div>
+                        <p id="dataFeedbackMessage">Score message will appear here</p>
+                    </div>
+                    
+                    <div id="dataQuestionReview" class="question-review">
+                        <!-- Question review will be dynamically inserted here -->
+                    </div>
+                    
+                    <button onclick="closeDataExercise()" class="btn btn-primary">Close Exercise</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Exercise Modal Styles */
+        .exercise-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            overflow-y: auto;
+        }
+
+        .exercise-modal-content {
+            background: white;
+            width: 90%;
+            max-width: 800px;
+            margin: 40px auto;
+            border-radius: 12px;
+            position: relative;
+            padding: 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .exercise-modal-header {
+            background: #6900cc;
+            color: white;
+            padding: 20px 24px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .exercise-modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .exercise-modal-close {
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        .exercise-modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .exercise-section {
+            padding: 30px;
+        }
+
+        .exercise-intro-content {
+            text-align: center;
+        }
+
+        .exercise-icon {
+            font-size: 48px;
+            color: #6900cc;
+            margin-bottom: 20px;
+        }
+
+        .exercise-intro-content h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .exercise-intro-content p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .exercise-instructions {
+            background: #f8f9fa;
+            border-left: 4px solid #6900cc;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .exercise-instructions h4 {
+            color: #6900cc;
+            margin-bottom: 15px;
+        }
+
+        .exercise-instructions ul {
+            color: #666;
+            line-height: 1.8;
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .exercise-instructions li {
+            margin-bottom: 8px;
+        }
+
+        .exercise-question {
+            margin-bottom: 30px;
+        }
+
+        .exercise-question h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .exercise-question p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .exercise-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .exercise-option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .exercise-option:hover {
+            background: #6900cc;
+            color: white;
+            border-color: #6900cc;
+            transform: translateY(-2px);
+        }
+
+        .exercise-results-content {
+            text-align: center;
+        }
+
+        .score-display {
+            margin: 30px 0;
+        }
+
+        .score-number {
+            font-size: 48px;
+            color: #6900cc;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .score-display p {
+            font-size: 1.2rem;
+            color: #666;
+            margin: 0;
+        }
+
+        .question-review {
+            text-align: left;
+            margin: 30px 0;
+        }
+
+        .question-review h4 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .question-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #e9ecef;
+        }
+
+        .question-item.correct {
+            border-left-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .question-item.incorrect {
+            border-left-color: #dc3545;
+            background: #fff8f8;
+        }
+
+        .question-item h5 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .user-answer {
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .correct-answer {
+            color: #28a745;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .explanation {
+            color: #666;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .status-icon {
+            float: right;
+            font-size: 1.2rem;
+            margin-top: 5px;
+        }
+
+        .question-item.correct .status-icon {
+            color: #28a745;
+        }
+
+        .question-item.incorrect .status-icon {
+            color: #dc3545;
+        }
+
+        /* Force red color for exercise icon */
+        .lesson-info.exercise-lesson .fa-puzzle-piece {
+            color: #e74c3c !important;
+        }
+        
+        /* More specific selector to override any other styles */
+        #data-exercise-lesson .fas.fa-puzzle-piece {
+            color: #e74c3c !important;
+        }
+        
+        /* Even more specific to override everything */
+        div.lesson-info.exercise-lesson#data-exercise-lesson i.fas.fa-puzzle-piece {
+            color: #e74c3c !important;
+        }
+    </style>
+
+    <script>
+        // Data Protection Exercise Functions
+        window.openDataExercise = function() {
+            console.log('Opening data protection exercise modal...');
+            const modal = document.getElementById('dataExerciseModal');
+            if (modal) {
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                
+                // Check if user is admin
+                const currentUser = JSON.parse(localStorage.getItem('cybertech_user') || '{}');
+                console.log('Current user:', currentUser);
+                console.log('Is admin?', currentUser.isAdmin);
+                
+                // If user is admin, always allow retaking
+                const isAdmin = currentUser.role === 'admin' || currentUser.isAdmin === true;
+                if (isAdmin) {
+                    console.log('Admin user - allowing exercise retake');
+                    // Force show intro page for admin immediately
+                    document.getElementById('dataExerciseIntro').style.display = 'block';
+                    document.getElementById('dataExerciseQuestions').style.display = 'none';
+                    document.getElementById('dataExerciseResults').style.display = 'none';
+                    resetDataExercise();
+                }
+                // For regular users, check if they've already completed
+                else {
+                    const existingResults = JSON.parse(localStorage.getItem('cybertech_assessment_results') || '[]');
+                    
+                    // Find user's previous result for this exercise
+                    const userPreviousResult = existingResults.find(result => 
+                        result.exerciseName === 'Classifying Sample Data' && 
+                        (result.userId === currentUser.id || 
+                         result.userId === currentUser.username || 
+                         result.name === currentUser.username || 
+                         result.name === currentUser.name)
+                    );
+                    
+                    // If user has already completed, show previous results
+                    if (userPreviousResult) {
+                        console.log('User has already completed exercise - showing previous results');
+                        showPreviousDataResults(userPreviousResult);
+                    }
+                    // If user hasn't completed yet, start fresh
+                    else {
+                        console.log('New user - starting fresh exercise');
+                        resetDataExercise();
+                    }
+                }
+                
+                console.log('Data protection exercise modal opened successfully');
+            } else {
+                console.error('Data protection exercise modal not found!');
+            }
+        };
+
+        window.closeDataExercise = function() {
+            const modal = document.getElementById('dataExerciseModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        };
+
+        window.startDataExercise = function() {
+            document.getElementById('dataExerciseIntro').style.display = 'none';
+            document.getElementById('dataExerciseQuestions').style.display = 'block';
+            showDataQuestion(0);
+        };
+
+        // Data protection exercise questions
+        const dataQuestions = [
+            {
+                question: "Which data classification level is appropriate for employee salary information?",
+                options: [
+                    "Public",
+                    "Internal",
+                    "Confidential",
+                    "Restricted"
+                ],
+                correct: 2,
+                explanation: "Employee salary information should be classified as Confidential as it contains sensitive personal information that could cause harm if disclosed."
+            },
+            {
+                question: "A customer's credit card number should be classified as:",
+                options: [
+                    "Internal",
+                    "Confidential",
+                    "Restricted",
+                    "Public"
+                ],
+                correct: 2,
+                explanation: "Credit card numbers are highly sensitive financial data that require the highest level of protection - Restricted classification."
+            },
+            {
+                question: "Which classification is appropriate for a public press release?",
+                options: [
+                    "Public",
+                    "Internal",
+                    "Confidential",
+                    "Restricted"
+                ],
+                correct: 0,
+                explanation: "Press releases are intended for public consumption and should be classified as Public data."
+            },
+            {
+                question: "Internal company policies should be classified as:",
+                options: [
+                    "Public",
+                    "Internal",
+                    "Confidential",
+                    "Restricted"
+                ],
+                correct: 1,
+                explanation: "Company policies are meant for employee use but not public distribution, making them Internal data."
+            },
+            {
+                question: "How should you classify source code for proprietary software?",
+                options: [
+                    "Internal",
+                    "Public",
+                    "Confidential",
+                    "Restricted"
+                ],
+                correct: 3,
+                explanation: "Proprietary source code is a valuable intellectual property asset that requires Restricted classification."
+            },
+            {
+                question: "Employee performance reviews should be classified as:",
+                options: [
+                    "Public",
+                    "Internal",
+                    "Confidential",
+                    "Restricted"
+                ],
+                correct: 2,
+                explanation: "Performance reviews contain personal information and evaluations that should be classified as Confidential."
+            },
+            {
+                question: "Which classification is appropriate for marketing materials?",
+                options: [
+                    "Public",
+                    "Internal",
+                    "Confidential",
+                    "Restricted"
+                ],
+                correct: 0,
+                explanation: "Marketing materials are designed for public distribution and should be classified as Public data."
+            },
+            {
+                question: "Customer support tickets should be classified as:",
+                options: [
+                    "Public",
+                    "Internal",
+                    "Confidential",
+                    "Restricted"
+                ],
+                correct: 2,
+                explanation: "Support tickets often contain customer personal information and should be classified as Confidential."
+            },
+            {
+                question: "How should you classify network infrastructure diagrams?",
+                options: [
+                    "Public",
+                    "Internal",
+                    "Confidential",
+                    "Restricted"
+                ],
+                correct: 3,
+                explanation: "Network diagrams contain sensitive security information and should be classified as Restricted."
+            },
+            {
+                question: "Which classification is appropriate for the company phone directory?",
+                options: [
+                    "Public",
+                    "Internal",
+                    "Confidential",
+                    "Restricted"
+                ],
+                correct: 1,
+                explanation: "The company phone directory is for internal use only and should be classified as Internal data."
+            }
+        ];
+
+        let currentDataQuestion = 0;
+        let dataScore = 0;
+        let dataUserAnswers = [];
+
+        window.resetDataExercise = function() {
+            console.log('Resetting data exercise...');
+            currentDataQuestion = 0;
+            dataScore = 0;
+            dataUserAnswers = [];
+            
+            // Always show intro page first
+            document.getElementById('dataExerciseIntro').style.display = 'block';
+            document.getElementById('dataExerciseQuestions').style.display = 'none';
+            document.getElementById('dataExerciseResults').style.display = 'none';
+            
+            // Clear question review
+            const questionReview = document.getElementById('dataQuestionReview');
+            if (questionReview) {
+                questionReview.innerHTML = '';
+            }
+            
+            console.log('Data exercise reset complete - intro page should be visible');
+        };
+
+        window.showDataQuestion = function(index) {
+            const questionsContainer = document.getElementById('dataExerciseQuestions');
+            const question = dataQuestions[index];
+
+            const html = `
+                <div class="exercise-question">
+                    <h4>Question ${index + 1} of 10:</h4>
+                    <p>${question.question}</p>
+                    <div class="exercise-options">
+                        ${question.options.map((option, i) => `
+                            <div class="exercise-option" onclick="selectDataAnswer(${i})">
+                                ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            questionsContainer.innerHTML = html;
+        };
+
+        window.selectDataAnswer = function(answerIndex) {
+            dataUserAnswers[currentDataQuestion] = answerIndex;
+            if (answerIndex === dataQuestions[currentDataQuestion].correct) {
+                dataScore++;
+            }
+
+            if (currentDataQuestion < dataQuestions.length - 1) {
+                currentDataQuestion++;
+                showDataQuestion(currentDataQuestion);
+            } else {
+                showDataResults();
+            }
+        };
+
+        window.showDataResults = function() {
+            const percentage = Math.round((dataScore / dataQuestions.length) * 100);
+            
+            // Generate feedback message based on score
+            let feedbackMessage = '';
+            if (percentage >= 80) {
+                feedbackMessage = 'Excellent! You have excellent understanding of data classification principles! 👍';
+            } else if (percentage >= 60) {
+                feedbackMessage = 'Good job! You have good data classification knowledge, but there\'s room for improvement. 👍';
+            } else if (percentage >= 40) {
+                feedbackMessage = 'Not bad! You have some data classification knowledge, but you need to learn more. 📚';
+            } else {
+                feedbackMessage = 'Keep learning! Review the course materials to improve your data classification knowledge. 📚';
+            }
+            
+            // Save result for admin view
+            const currentUser = JSON.parse(localStorage.getItem('cybertech_user') || '{}');
+            const exerciseResult = {
+                name: currentUser.username || currentUser.name || 'Anonymous User',
+                email: currentUser.email || 'No email provided',
+                userId: currentUser.id || currentUser.username || 'unknown',
+                score: percentage,
+                dateTaken: new Date().toISOString().split('T')[0],
+                category: 'Data Protection',
+                status: percentage >= 50 ? 'passed' : 'failed',
+                exerciseName: 'Classifying Sample Data'
+            };
+            
+            // Only save if not admin
+            if (!currentUser.isAdmin) {
+                const existingResults = JSON.parse(localStorage.getItem('cybertech_assessment_results') || '[]');
+                existingResults.push(exerciseResult);
+                localStorage.setItem('cybertech_assessment_results', JSON.stringify(existingResults));
+            }
+
+            // Update results display
+            document.getElementById('dataExerciseQuestions').style.display = 'none';
+            document.getElementById('dataExerciseResults').style.display = 'block';
+            document.getElementById('dataScoreDisplay').textContent = `${dataScore}/${dataQuestions.length}`;
+            document.getElementById('dataFeedbackMessage').textContent = feedbackMessage;
+            
+            // Generate question review
+            generateDataQuestionReview();
+        };
+
+        window.generateDataQuestionReview = function() {
+            const reviewContainer = document.getElementById('dataQuestionReview');
+            let reviewHTML = '<h4>Question Review:</h4>';
+            
+            dataQuestions.forEach((question, index) => {
+                const userAnswer = dataUserAnswers[index];
+                const isCorrect = userAnswer === question.correct;
+                const userAnswerText = question.options[userAnswer];
+                const correctAnswerText = question.options[question.correct];
+                
+                reviewHTML += `
+                    <div class="question-item ${isCorrect ? 'correct' : 'incorrect'}">
+                        <i class="fas fa-${isCorrect ? 'check' : 'times'} status-icon"></i>
+                        <h5>Question ${index + 1}: ${question.question}</h5>
+                        <div class="user-answer">Your answer: ${userAnswerText}</div>
+                        ${!isCorrect ? `<div class="correct-answer">Correct answer: ${correctAnswerText}</div>` : ''}
+                        <div class="explanation">${question.explanation}</div>
+                    </div>
+                `;
+            });
+            
+            reviewContainer.innerHTML = reviewHTML;
+        };
+
+        window.showPreviousDataResults = function(previousResult) {
+            // Hide intro and questions, show results
+            document.getElementById('dataExerciseIntro').style.display = 'none';
+            document.getElementById('dataExerciseQuestions').style.display = 'none';
+            document.getElementById('dataExerciseResults').style.display = 'block';
+            
+            // Update score display - convert percentage to X/10 format
+            const scorePercentage = previousResult.score;
+            const userScore = Math.round((scorePercentage / 100) * 10);
+            
+            document.getElementById('dataScoreDisplay').textContent = `${userScore}/10`;
+            
+            // Generate feedback message based on score
+            const percentage = previousResult.score;
+            let feedbackMessage = '';
+            if (percentage >= 80) {
+                feedbackMessage = 'Excellent! You have excellent understanding of data classification principles! 👍';
+            } else if (percentage >= 60) {
+                feedbackMessage = 'Good job! You have good data classification knowledge, but there\'s room for improvement. 👍';
+            } else if (percentage >= 40) {
+                feedbackMessage = 'Not bad! You have some data classification knowledge, but you need to learn more. 📚';
+            } else {
+                feedbackMessage = 'Keep learning! Review the course materials to improve your data classification knowledge. 📚';
+            }
+            
+            document.getElementById('dataFeedbackMessage').textContent = feedbackMessage;
+            
+            // Remove any existing previous result messages first
+            const resultsContainer = document.getElementById('dataExerciseResults');
+            const existingMessages = resultsContainer.querySelectorAll('[data-previous-result]');
+            existingMessages.forEach(msg => msg.remove());
+            
+            // Show previous results message
+            const previousResultsMessage = document.createElement('div');
+            previousResultsMessage.setAttribute('data-previous-result', 'true');
+            previousResultsMessage.innerHTML = `
+                <div style="background: #e3f2fd; border: 1px solid #2196f3; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                    <i class="fas fa-info-circle" style="color: #2196f3;"></i>
+                    <strong>Previous Result:</strong> You completed this exercise on ${previousResult.dateTaken} with a score of ${userScore}/10 (${percentage}%).
+                </div>
+            `;
+            resultsContainer.insertBefore(previousResultsMessage, resultsContainer.firstChild);
+        };
+
+        // Initialize exercise modal handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            // Close modal when clicking outside
+            const modal = document.getElementById('dataExerciseModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeDataExercise();
+                    }
+                });
+            }
+
+            // Close modal on ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const modal = document.getElementById('dataExerciseModal');
+                    if (modal && modal.style.display === 'block') {
+                        closeDataExercise();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

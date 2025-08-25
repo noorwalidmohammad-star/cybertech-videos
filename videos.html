@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Library | CyberTech - Interactive Cybersecurity Awareness Platform</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="js/settings-manager.js"></script>
+    <style>
+        /* Video Modal Styles */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            overflow: auto;
+        }
+        
+        .video-modal-content {
+            position: relative;
+            background-color: #000;
+            margin: 5% auto;
+            width: 90%;
+            max-width: 900px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .video-modal-header {
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .video-modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+        
+        .close-modal:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .video-player {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            background-color: #000;
+        }
+        
+        .video-modal-info {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        
+        .video-modal-info p {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .videos-header {
+            background-color: var(--primary-color);
+            padding: 120px 0 60px;
+            color: var(--white);
+            text-align: center;
+        }
+        
+        .videos-header h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+        
+        .videos-header p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .videos-section {
+            padding: 80px 0;
+            background-color: #f8f9fa;
+        }
+        
+        .videos-filters {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group select {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 5px;
+            background: white;
+            min-width: 200px;
+        }
+        
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .video-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .video-thumbnail {
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+        
+        .play-button {
+            position: absolute;
+            background: rgba(255,255,255,0.9);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .play-button:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+        
+        .video-content {
+            padding: 20px;
+        }
+        
+        .video-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        .video-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .video-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 15px;
+        }
+        
+        .video-path {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .video-path i {
+            margin-right: 5px;
+        }
+        
+        .no-videos {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .no-videos i {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        /* Video Modal */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+        }
+        
+        .video-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 800px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .video-modal-header {
+            padding: 20px;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            margin-left: auto;
+        }
+        
+        .video-player {
+            width: 100%;
+            max-height: 400px;
+        }
+        
+        .video-modal-info {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <h1><a href="index.html" class="platform-name-styled"><span class="cyber-part">Cyber</span><span class="tech-part">Tech</span></a></h1>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="index.html#courses">Courses</a></li>
+                    <li><a href="videos.html" class="active">Videos</a></li>
+                    <li><a href="interactive-demos.html">Interactive Demos</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+                <div class="nav-buttons">
+                    <a href="login.html" class="btn btn-secondary">Login</a>
+                    <a href="register.html" class="btn btn-primary">Sign Up</a>
+                </div>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Videos Header -->
+    <section class="videos-header">
+        <div class="container">
+            <h1>Video Library</h1>
+            <p>Access our comprehensive collection of cybersecurity training videos, organized by courses, modules, and lessons for structured learning.</p>
+        </div>
+    </section>
+
+    <!-- Videos Section -->
+    <section class="videos-section">
+        <div class="container">
+            <!-- Filters -->
+            <div class="videos-filters">
+                <div class="filter-group">
+                    <select id="filter-course">
+                        <option value="">All Courses</option>
+                    </select>
+                    <select id="filter-module">
+                        <option value="">All Modules</option>
+                    </select>
+                    <select id="filter-lesson">
+                        <option value="">All Lessons</option>
+                    </select>
+                    <input type="text" id="search-videos" placeholder="Search videos..." style="padding: 10px 15px; border: 2px solid #e9ecef; border-radius: 5px; min-width: 200px;">
+                    <button onclick="refreshVideos()" style="padding: 10px 15px; background: var(--primary-color); color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Videos Grid -->
+            <div id="videosContainer">
+                <div class="videos-grid" id="videosGrid">
+                    <!-- Videos will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="video-modal">
+        <div class="video-modal-content">
+            <div class="video-modal-header">
+                <h3 id="modalVideoTitle">Video Title</h3>
+                <button class="close-modal" onclick="closeVideoModal()">&times;</button>
+            </div>
+            <div id="adminOnlyMessage" style="display: none; background-color: #f8d7da; color: #721c24; padding: 15px; text-align: center; font-weight: bold;">
+                This video is not available. Only content uploaded by administrators can be played.
+            </div>
+            <video id="modalVideoPlayer" class="video-player" controls controlsList="nodownload" playsinline>
+                Your browser does not support the video tag.
+            </video>
+            <div class="video-controls" style="background: #333; padding: 10px; display: flex; justify-content: center;">
+                <button onclick="document.getElementById('modalVideoPlayer').play()" style="margin: 0 5px; padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                    <i class="fas fa-play"></i> Play
+                </button>
+                <button onclick="document.getElementById('modalVideoPlayer').pause()" style="margin: 0 5px; padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                    <i class="fas fa-pause"></i> Pause
+                </button>
+                <button onclick="document.getElementById('modalVideoPlayer').currentTime = 0" style="margin: 0 5px; padding: 5px 10px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                    <i class="fas fa-redo"></i> Restart
+                </button>
+                <button onclick="toggleFullScreen()" style="margin: 0 5px; padding: 5px 10px; background: #9c27b0; color: white; border: none; border-radius: 3px; cursor: pointer;">
+                    <i class="fas fa-expand"></i> Fullscreen
+                </button>
+            </div>
+            <div class="video-modal-info">
+                <p id="modalVideoDescription">Video description will appear here.</p>
+                <div id="modalVideoPath" class="video-path">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Course > Module > Lesson</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <h3 class="platform-name-styled"><span class="cyber-part">Cyber</span><span class="tech-part">Tech</span></h3>
+                    <p>Empowering employees with cybersecurity awareness through interactive learning experiences.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#courses">Courses</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact Info</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> info@cybertech.com</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        let userVideos = [];
+        let filteredVideos = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mark existing videos as admin-uploaded (one-time migration)
+            migrateExistingVideos();
+            
+            loadUserVideos();
+            setupEventListeners();
+            
+            // Check for video updates periodically
+            setInterval(checkForVideoUpdates, 5000);
+        });
+        
+        // One-time migration to mark existing videos as admin-uploaded
+        function migrateExistingVideos() {
+            const migrationDone = localStorage.getItem('cybertech_videos_migration_done');
+            if (!migrationDone) {
+                console.log('Migrating existing videos to add admin flag...');
+                const allVideos = JSON.parse(localStorage.getItem('cybertech_user_videos') || '[]');
+                
+                // Mark all existing videos as admin-uploaded
+                const updatedVideos = allVideos.map(video => ({
+                    ...video,
+                    isAdminUploaded: true
+                }));
+                
+                localStorage.setItem('cybertech_user_videos', JSON.stringify(updatedVideos));
+                localStorage.setItem('cybertech_videos_migration_done', 'true');
+                console.log('Migration completed. All existing videos marked as admin-uploaded.');
+            }
+        }
+        
+        function checkForVideoUpdates() {
+            const lastUpdate = localStorage.getItem('cybertech_videos_last_update');
+            const lastCheck = sessionStorage.getItem('cybertech_videos_last_check') || '0';
+            
+            if (lastUpdate && parseInt(lastUpdate) > parseInt(lastCheck)) {
+                console.log('New videos detected, refreshing...');
+                sessionStorage.setItem('cybertech_videos_last_check', lastUpdate);
+                loadUserVideos();
+            }
+        }
+
+        function loadUserVideos() {
+            // Load videos uploaded by admin
+            let allVideos = JSON.parse(localStorage.getItem('cybertech_user_videos') || '[]');
+            // Filter to only show admin-uploaded videos
+            userVideos = allVideos.filter(video => video.isAdminUploaded === true);
+            console.log('Loaded user videos:', userVideos);
+            console.log('Total admin videos found:', userVideos.length);
+            console.log('Filtered out non-admin videos:', allVideos.length - userVideos.length);
+            
+            if (userVideos.length === 0) {
+                console.log('No videos found in cybertech_user_videos storage');
+            } else {
+                userVideos.forEach((video, index) => {
+                    console.log(`Video ${index + 1}:`, video.title, 'URL:', video.videoUrl ? 'Available' : 'Missing');
+                });
+            }
+            
+            populateFilters();
+            displayVideos(userVideos);
+        }
+
+        function populateFilters() {
+            const courseFilter = document.getElementById('filter-course');
+            const moduleFilter = document.getElementById('filter-module');
+            const lessonFilter = document.getElementById('filter-lesson');
+
+            // Get unique courses, modules, lessons
+            const courses = [...new Set(userVideos.map(v => v.courseName))];
+            const modules = [...new Set(userVideos.map(v => v.moduleName))];
+            const lessons = [...new Set(userVideos.map(v => v.lessonName))];
+
+            // Populate course filter
+            courses.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course;
+                option.textContent = course;
+                courseFilter.appendChild(option);
+            });
+
+            // Populate module filter
+            modules.forEach(module => {
+                const option = document.createElement('option');
+                option.value = module;
+                option.textContent = module;
+                moduleFilter.appendChild(option);
+            });
+
+            // Populate lesson filter
+            lessons.forEach(lesson => {
+                const option = document.createElement('option');
+                option.value = lesson;
+                option.textContent = lesson;
+                lessonFilter.appendChild(option);
+            });
+        }
+
+        function displayVideos(videos) {
+            const container = document.getElementById('videosGrid');
+            
+            if (videos.length === 0) {
+                container.innerHTML = `
+                    <div class="no-videos" style="grid-column: 1 / -1;">
+                        <i class="fas fa-video"></i>
+                        <h3>No Videos Available</h3>
+                        <p>Videos will appear here once they are uploaded by administrators.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = videos.map(video => `
+                <div class="video-card">
+                    <div class="video-thumbnail">
+                        <i class="fas fa-play-circle"></i>
+                        <button class="play-button" onclick="playVideo('${video.id}')">
+                            <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    <div class="video-content">
+                        <div class="video-title">${video.title}</div>
+                        <div class="video-description">${video.description || 'No description available'}</div>
+                        <div class="video-meta">
+                            <span><i class="fas fa-clock"></i> ${video.duration} min</span>
+                            <span><i class="fas fa-signal"></i> ${video.difficulty}</span>
+                        </div>
+                        <div class="video-path">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${video.courseName} > ${video.moduleName} > ${video.lessonName}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setupEventListeners() {
+            document.getElementById('filter-course').addEventListener('change', filterVideos);
+            document.getElementById('filter-module').addEventListener('change', filterVideos);
+            document.getElementById('filter-lesson').addEventListener('change', filterVideos);
+            document.getElementById('search-videos').addEventListener('input', filterVideos);
+        }
+
+        function filterVideos() {
+            const courseFilter = document.getElementById('filter-course').value;
+            const moduleFilter = document.getElementById('filter-module').value;
+            const lessonFilter = document.getElementById('filter-lesson').value;
+            const searchTerm = document.getElementById('search-videos').value.toLowerCase();
+
+            filteredVideos = userVideos.filter(video => {
+                const matchesCourse = !courseFilter || video.courseName === courseFilter;
+                const matchesModule = !moduleFilter || video.moduleName === moduleFilter;
+                const matchesLesson = !lessonFilter || video.lessonName === lessonFilter;
+                const matchesSearch = !searchTerm || 
+                    video.title.toLowerCase().includes(searchTerm) ||
+                    video.description.toLowerCase().includes(searchTerm) ||
+                    video.courseName.toLowerCase().includes(searchTerm);
+
+                return matchesCourse && matchesModule && matchesLesson && matchesSearch;
+            });
+
+            displayVideos(filteredVideos);
+        }
+
+        function playVideo(videoId) {
+            const video = userVideos.find(v => v.id == videoId);
+            if (!video) {
+                alert('Video not found');
+                return;
+            }
+
+            if (!video.videoUrl) {
+                alert('Video file is not available. Please contact administrator.');
+                return;
+            }
+            
+            // Check if video is admin-uploaded
+            if (!video.isAdminUploaded) {
+                // Show the modal with admin-only message
+                document.getElementById('modalVideoTitle').textContent = video.title;
+                document.getElementById('adminOnlyMessage').style.display = 'block';
+                document.getElementById('modalVideoPlayer').style.display = 'none';
+                document.querySelector('.video-controls').style.display = 'none';
+                document.getElementById('videoModal').style.display = 'block';
+                return;
+            } else {
+                // Reset display for admin videos
+                document.getElementById('adminOnlyMessage').style.display = 'none';
+                document.getElementById('modalVideoPlayer').style.display = 'block';
+                document.querySelector('.video-controls').style.display = 'flex';
+            }
+
+            // Update modal content
+            document.getElementById('modalVideoTitle').textContent = video.title;
+            document.getElementById('modalVideoDescription').textContent = video.description || 'No description available';
+            document.getElementById('modalVideoPath').innerHTML = `
+                <i class="fas fa-map-marker-alt"></i>
+                ${video.courseName} > ${video.moduleName} > ${video.lessonName}
+            `;
+
+            // Set video source
+            const videoPlayer = document.getElementById('modalVideoPlayer');
+            
+            // Clear any existing sources
+            videoPlayer.innerHTML = '';
+            
+            // Enhanced video URL handling for better playback
+            if (video.videoUrl) {
+                try {
+                    // Convert base64 to Blob URL
+                    const base64Data = video.videoUrl;
+                    const byteCharacters = atob(base64Data.split(',')[1] || base64Data);
+                    const byteArrays = [];
+                    
+                    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                        const slice = byteCharacters.slice(offset, offset + 512);
+                        const byteNumbers = new Array(slice.length);
+                        for (let i = 0; i < slice.length; i++) {
+                            byteNumbers[i] = slice.charCodeAt(i);
+                        }
+                        const byteArray = new Uint8Array(byteNumbers);
+                        byteArrays.push(byteArray);
+                    }
+                    
+                    const blob = new Blob(byteArrays, { type: 'video/mp4' });
+                    const blobUrl = URL.createObjectURL(blob);
+                    videoPlayer.src = blobUrl;
+                    
+                    // Clean up old blob URL when video is done
+                    videoPlayer.onended = function() {
+                        URL.revokeObjectURL(blobUrl);
+                    };
+                } catch (error) {
+                    console.error('Error converting video data:', error);
+                    videoPlayer.src = video.videoUrl;
+                }
+                
+                // Add enhanced error handling
+                videoPlayer.onerror = function(e) {
+                    console.error('Failed to load video:', video.title, e);
+                    
+                    // Try alternative video format if available
+                    if (video.alternateUrl) {
+                        console.log('Trying alternate video URL...');
+                        videoPlayer.src = video.alternateUrl;
+                        return;
+                    }
+                    
+                    // Show friendly error
+                    alert('Unable to play this video. The file may be in an unsupported format or temporarily unavailable.');
+                    closeVideoModal();
+                };
+                
+                videoPlayer.onloadeddata = function() {
+                    console.log('Video loaded successfully:', video.title);
+                };
+            } else {
+                alert('Video URL is not available. Please contact administrator.');
+                return;
+            }
+
+            // Show modal
+            document.getElementById('videoModal').style.display = 'block';
+            
+            // Ensure video starts playing when modal opens
+            videoPlayer.play().catch(e => {
+                console.log('Autoplay prevented:', e);
+            });
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            const videoPlayer = document.getElementById('modalVideoPlayer');
+            
+            // Pause video and reset
+            videoPlayer.pause();
+            videoPlayer.currentTime = 0;
+            videoPlayer.src = ''; // Clear source to stop loading
+            
+            // Reset admin-only message
+            document.getElementById('adminOnlyMessage').style.display = 'none';
+            videoPlayer.style.display = 'block';
+            document.querySelector('.video-controls').style.display = 'flex';
+            
+            // Hide modal
+            modal.style.display = 'none';
+        }
+
+        // Refresh videos function
+        function refreshVideos() {
+            console.log('Refreshing videos...');
+            loadUserVideos();
+        }
+        
+        // Toggle fullscreen for video
+        function toggleFullScreen() {
+            const video = document.getElementById('modalVideoPlayer');
+            
+            if (!document.fullscreenElement) {
+                if (video.requestFullscreen) {
+                    video.requestFullscreen();
+                } else if (video.webkitRequestFullscreen) { /* Safari */
+                    video.webkitRequestFullscreen();
+                } else if (video.msRequestFullscreen) { /* IE11 */
+                    video.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) { /* Safari */
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) { /* IE11 */
+                    document.msExitFullscreen();
+                }
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('videoModal');
+            if (event.target === modal) {
+                closeVideoModal();
+            }
+        }
+    </script>
+</body>
+</html> 

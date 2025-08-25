@@ -1,0 +1,2904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Engineering Defense | CyberTech</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Force red color for exercise icon */
+        .lesson-info.exercise-lesson .fa-puzzle-piece {
+            color: #e74c3c !important;
+        }
+        
+        /* More specific selector to override any other styles */
+        #social-exercise-lesson .fas.fa-puzzle-piece {
+            color: #e74c3c !important;
+        }
+        
+        /* Even more specific to override everything */
+        div.lesson-info.exercise-lesson#social-exercise-lesson i.fas.fa-puzzle-piece {
+            color: #e74c3c !important;
+        }
+    </style>
+    <script src="js/settings-manager.js"></script>
+    <script src="js/course-updater.js"></script>
+    <script src="js/direct-lesson-injector.js"></script>
+    
+    <!-- PERMANENT OVERRIDE: Block video for Social Engineering exercise -->
+    <script>
+    // Override openVideoModal to block video for Social Engineering exercise
+    const originalOpenVideoModal = window.openVideoModal;
+    window.openVideoModal = function(title, videoId, duration) {
+        // Block video for Social Engineering exercise
+        if (title === 'Interactive Exercise: Identifying Attack Types' || title.includes('Identifying Attack Types')) {
+            console.log('◆◆Blocking video for Interactive Exercise - opening exercise instead');
+            if (typeof window.openSocialExercise === 'function') {
+                window.openSocialExercise();
+            }
+            return;
+        }
+        
+        // Call original function for all other videos
+        if (originalOpenVideoModal) {
+            originalOpenVideoModal.apply(this, arguments);
+        }
+    };
+
+    // Also override any direct video modal opening
+    const originalVideoModal = document.getElementById('videoModal');
+    if (originalVideoModal) {
+        const originalDisplay = originalVideoModal.style.display;
+        Object.defineProperty(originalVideoModal.style, 'display', {
+            set: function(value) {
+                // Check if we're trying to show video for Social Engineering exercise
+                const videoTitle = document.getElementById('videoTitle')?.textContent;
+                if (value === 'block' && (videoTitle === 'Interactive Exercise: Identifying Attack Types')) {
+                    console.log('◆◆Blocking video modal for Social Engineering exercise:', videoTitle);
+                    if (typeof window.openSocialExercise === 'function') {
+                        window.openSocialExercise();
+                    }
+                    return; // Don't show the modal
+                }
+                originalDisplay = value;
+            },
+            get: function() {
+                return originalDisplay;
+            }
+        });
+    }
+
+    // Also override any direct lesson click handlers
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle Social Engineering exercise
+        const socialExerciseLesson = document.querySelector('.lesson-info[onclick="openSocialExercise()"]');
+        if (socialExerciseLesson) {
+            // Remove any existing click handlers
+            const newLesson = socialExerciseLesson.cloneNode(true);
+            socialExerciseLesson.parentNode.replaceChild(newLesson, socialExerciseLesson);
+            
+            // Add our specific handler
+            newLesson.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Opening Social Engineering exercise directly');
+                
+                // STOP ANY VIDEOS BEFORE OPENING EXERCISE
+                const allVideos = document.querySelectorAll('video');
+                allVideos.forEach(function(video) {
+                    video.pause();
+                    video.currentTime = 0;
+                    video.muted = true;
+                });
+                
+                if (typeof window.openSocialExercise === 'function') {
+                    window.openSocialExercise();
+                }
+            });
+        }
+        
+        // Also override any global video functions that might be called
+        if (typeof window.playVideo === 'function') {
+            const originalPlayVideo = window.playVideo;
+            window.playVideo = function(videoId, title) {
+                if (title && title.includes('Identifying Attack Types')) {
+                    console.log('◆◆Blocking playVideo for Social Engineering exercise');
+                    if (typeof window.openSocialExercise === 'function') {
+                        window.openSocialExercise();
+                    }
+                    return;
+                }
+                return originalPlayVideo.apply(this, arguments);
+            };
+        }
+    });
+
+    // Ensure the exercise is always available
+    document.addEventListener('DOMContentLoaded', function() {
+            // Force red color for exercise icon
+    const exerciseIcon = document.querySelector('#social-exercise-lesson .fa-puzzle-piece');
+    console.log('🔍 Looking for exercise icon:', exerciseIcon);
+    if (exerciseIcon) {
+        console.log('🎯 Found exercise icon, setting color to red');
+        exerciseIcon.style.setProperty('color', '#e74c3c', 'important');
+        console.log('✅ Icon color set to:', exerciseIcon.style.color);
+        
+        // Set up a mutation observer to keep the color red
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                    console.log('🔄 Icon style changed, resetting to red');
+                    exerciseIcon.style.setProperty('color', '#e74c3c', 'important');
+                }
+            });
+        });
+        observer.observe(exerciseIcon, { attributes: true, attributeFilter: ['style'] });
+    } else {
+        console.log('❌ Exercise icon not found!');
+    }
+    
+    // Set up periodic check to ensure icon stays red
+    setInterval(function() {
+        const icon = document.querySelector('#social-exercise-lesson .fa-puzzle-piece');
+        if (icon && icon.style.color !== '#e74c3c') {
+            console.log('🔄 Periodic check: Icon not red, fixing...');
+            icon.style.setProperty('color', '#e74c3c', 'important');
+        }
+    }, 1000); // Check every second
+        
+        // Save exercise data permanently
+        const exerciseData = {
+            courseName: 'Social Engineering Defense',
+            lessonName: 'Interactive Exercise: Identifying Attack Types',
+            type: 'interactive',
+            duration: '10 min'
+        };
+        
+        // Save to localStorage to ensure persistence
+        const existingExercises = JSON.parse(localStorage.getItem('cybertech_interactive_exercises') || '[]');
+        const exerciseExists = existingExercises.find(ex => 
+            ex.courseName === exerciseData.courseName && 
+            ex.lessonName === exerciseData.lessonName
+        );
+        
+        if (!exerciseExists) {
+            existingExercises.push(exerciseData);
+            localStorage.setItem('cybertech_interactive_exercises', JSON.stringify(existingExercises));
+        }
+        
+        console.log('✅ Social Engineering exercise permanently saved');
+        
+        // Also save to course data for persistence
+        const courseData = JSON.parse(localStorage.getItem('cybertech_courses') || '[]');
+        const socialCourse = courseData.find(course => course.name === 'Social Engineering Defense');
+        
+        if (socialCourse) {
+            const exerciseExists = socialCourse.lessons.find(lesson => 
+                lesson.title === 'Interactive Exercise: Identifying Attack Types'
+            );
+            
+            if (!exerciseExists) {
+                socialCourse.lessons.push({
+                    id: 'social-exercise',
+                    title: 'Interactive Exercise: Identifying Attack Types',
+                    duration: '10 min',
+                    type: 'interactive'
+                });
+                localStorage.setItem('cybertech_courses', JSON.stringify(courseData));
+                console.log('✅ Exercise added to course data');
+            }
+        }
+    });
+    </script>
+    
+    <script>
+        // Function to block video for reading lessons
+        function blockVideoForReadingLessons() {
+            const readingLessons = document.querySelectorAll('.lesson-info[onclick="toggleReadingLesson(this)"]');
+            readingLessons.forEach(lesson => {
+                lesson.classList.remove('video-lesson');
+                const icon = lesson.querySelector('i:first-child');
+                if (icon) {
+                    icon.className = 'fas fa-file-alt';
+                }
+            });
+            console.log('✅ Blocked videos for reading lessons');
+        }
+
+        // Function to ensure reading lessons are properly configured
+        function ensureReadingLessons() {
+            const readingLessons = document.querySelectorAll('.lesson-info[onclick="toggleReadingLesson(this)"]');
+            readingLessons.forEach(lesson => {
+                // Remove any video-related classes
+                lesson.classList.remove('video-lesson');
+                
+                // Add reading-specific classes
+                lesson.classList.add('lesson-expandable');
+                
+                // Ensure correct icon
+                const icon = lesson.querySelector('i:first-child');
+                if (icon) {
+                    icon.className = 'fas fa-file-alt';
+                }
+                
+                // Ensure expand icon exists
+                let expandIcon = lesson.querySelector('.expand-icon');
+                if (!expandIcon) {
+                    expandIcon = document.createElement('i');
+                    expandIcon.className = 'fas fa-chevron-down expand-icon';
+                    lesson.appendChild(expandIcon);
+                }
+                
+                // Ensure expanded content container exists
+                let content = lesson.nextElementSibling;
+                if (!content || !content.classList.contains('lesson-expanded-content')) {
+                    content = document.createElement('div');
+                    content.className = 'lesson-expanded-content';
+                    content.style.display = 'none';
+                    lesson.parentNode.insertBefore(content, lesson.nextSibling);
+                }
+            });
+            
+            // Special handling for attack vectors lesson
+            const attackVectorsLesson = document.querySelector('.lesson-info span');
+            if (attackVectorsLesson && attackVectorsLesson.textContent === 'Common Attack Vectors and Examples') {
+                const lessonDiv = attackVectorsLesson.closest('.lesson-info');
+                if (lessonDiv) {
+                    // Remove video classes
+                    lessonDiv.classList.remove('video-lesson');
+                    lessonDiv.classList.add('reading-lesson');
+                    
+                    // Update icon
+                    const icon = lessonDiv.querySelector('i:first-child');
+                    if (icon) {
+                        icon.className = 'fas fa-file-alt';
+                    }
+                    
+                    // Remove any existing onclick and add new one
+                    lessonDiv.removeAttribute('onclick');
+                    lessonDiv.onclick = function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openAttackVectorsModal();
+                        return false;
+                    };
+                    
+                    console.log('✅ Attack vectors lesson properly configured');
+                }
+            }
+            
+            console.log('✅ Reading lessons properly configured');
+        }
+
+        // Function to open attack vectors modal
+        function openAttackVectorsModal() {
+            console.log('🎯 openAttackVectorsModal called');
+            
+            // Prevent any video modal from opening
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const modal = document.getElementById('attackVectorsModal');
+            if (modal) {
+                modal.style.display = 'block';
+                modal.style.visibility = 'visible';
+                modal.style.opacity = '1';
+                modal.style.zIndex = '1000';
+                console.log('✅ Opened attack vectors modal');
+            } else {
+                console.error('❌ Attack vectors modal not found');
+                // Fallback: create modal content dynamically
+                createAttackVectorsModal();
+            }
+        }
+
+        // Function to create attack vectors modal dynamically
+        function createAttackVectorsModal() {
+            const modalHTML = `
+                <div id="attackVectorsModal" class="reading-modal" style="display: block;">
+                    <div class="reading-modal-content">
+                        <div class="reading-modal-header">
+                            <h3>Common Attack Vectors and Examples</h3>
+                            <span class="reading-modal-close" onclick="closeAttackVectorsModal()">&times;</span>
+                        </div>
+                        <div class="attack-vectors-container">
+                            <div class="attack-card">
+                                <div class="attack-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <h4>Email-Based Attacks</h4>
+                                <p>Phishing emails that impersonate legitimate organizations to steal credentials or install malware.</p>
+                                <div class="example-box">
+                                    <h5><i class="fas fa-exclamation-triangle"></i> Example:</h5>
+                                    <p>An email claiming to be from your bank asking you to verify your account details by clicking a link.</p>
+                                </div>
+                            </div>
+                            <div class="attack-card">
+                                <div class="attack-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <h4>Phone-Based Attacks (Vishing)</h4>
+                                <p>Voice phishing attacks where attackers call victims pretending to be from legitimate organizations.</p>
+                                <div class="example-box">
+                                    <h5><i class="fas fa-exclamation-triangle"></i> Example:</h5>
+                                    <p>A caller claiming to be from Microsoft support asking for remote access to "fix" your computer.</p>
+                                </div>
+                            </div>
+                            <div class="attack-card">
+                                <div class="attack-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <h4>SMS-Based Attacks (Smishing)</h4>
+                                <p>Text message attacks that trick users into clicking malicious links or providing sensitive information.</p>
+                                <div class="example-box">
+                                    <h5><i class="fas fa-exclamation-triangle"></i> Example:</h5>
+                                    <p>A text claiming you've won a prize and need to click a link to claim it.</p>
+                                </div>
+                            </div>
+                            <div class="attack-card">
+                                <div class="attack-icon">
+                                    <i class="fas fa-user-tie"></i>
+                                </div>
+                                <h4>Impersonation Attacks</h4>
+                                <p>Attackers pretend to be someone in authority to gain access or information.</p>
+                                <div class="example-box">
+                                    <h5><i class="fas fa-exclamation-triangle"></i> Example:</h5>
+                                    <p>Someone claiming to be a company executive asking for urgent wire transfers.</p>
+                                </div>
+                            </div>
+                            <div class="attack-card">
+                                <div class="attack-icon">
+                                    <i class="fas fa-gift"></i>
+                                </div>
+                                <h4>Baiting Attacks</h4>
+                                <p>Using physical media or offers to lure victims into compromising their security.</p>
+                                <div class="example-box">
+                                    <h5><i class="fas fa-exclamation-triangle"></i> Example:</h5>
+                                    <p>Leaving infected USB drives in public places hoping someone will plug them in.</p>
+                                </div>
+                            </div>
+                            <div class="attack-card">
+                                <div class="attack-icon">
+                                    <i class="fas fa-handshake"></i>
+                                </div>
+                                <h4>Quid Pro Quo Attacks</h4>
+                                <p>Offering a service in exchange for information or access.</p>
+                                <div class="example-box">
+                                    <h5><i class="fas fa-exclamation-triangle"></i> Example:</h5>
+                                    <p>An attacker offers free IT support in exchange for login credentials.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            console.log('✅ Attack vectors modal created dynamically');
+        }
+
+        // Make function globally accessible
+        window.openAttackVectorsModal = openAttackVectorsModal;
+
+        // Function to close attack vectors modal
+        function closeAttackVectorsModal() {
+            const modal = document.getElementById('attackVectorsModal');
+            if (modal) {
+                modal.style.display = 'none';
+                console.log('✅ Closed attack vectors modal');
+            }
+        }
+
+        // Make function globally accessible
+        window.closeAttackVectorsModal = closeAttackVectorsModal;
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const attackVectorsModal = document.getElementById('attackVectorsModal');
+            const videoModal = document.getElementById('videoModal');
+            
+            if (event.target === attackVectorsModal) {
+                closeAttackVectorsModal();
+            } else if (event.target === videoModal) {
+                closeVideoModal();
+            }
+        }
+
+        // Function to toggle reading lessons content
+        function toggleReadingLesson(element) {
+            console.log('🎯 toggleReadingLesson called for:', element.querySelector('span')?.textContent);
+            const content = element.nextElementSibling;
+            const expandIcon = element.querySelector('.expand-icon');
+            
+            console.log('🔍 Content element:', content);
+            console.log('🔍 Expand icon:', expandIcon);
+            console.log('🔍 Current content display:', content?.style.display);
+            
+            // Check if content exists
+            if (!content) {
+                console.error('❌ No content element found for reading lesson');
+                return;
+            }
+            
+            // Check if expandIcon exists
+            if (!expandIcon) {
+                console.error('❌ No expand icon found for reading lesson');
+                return;
+            }
+            
+            if (content.style.display === 'none' || content.style.display === '') {
+                // Force the content to be visible
+                content.style.display = 'block';
+                content.style.visibility = 'visible';
+                content.style.opacity = '1';
+                content.style.height = 'auto';
+                content.style.overflow = 'visible';
+                
+                // Rotate the expand icon
+                expandIcon.classList.add('rotate');
+                expandIcon.style.transform = 'rotate(180deg)';
+                
+                console.log('✅ Reading content expanded successfully');
+                console.log('🔍 Content display style:', content.style.display);
+                console.log('🔍 Content visibility:', content.style.visibility);
+                console.log('🔍 Content opacity:', content.style.opacity);
+                
+                // Force a reflow to ensure the content is rendered
+                content.offsetHeight;
+                
+            } else {
+                content.style.display = 'none';
+                expandIcon.classList.remove('rotate');
+                expandIcon.style.transform = 'rotate(0deg)';
+                console.log('✅ Reading content collapsed successfully');
+            }
+        }
+    </script>
+    <script>
+        // Make sure the course content is always up to date with admin changes
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update timestamp to refresh data without deleting courses
+            localStorage.setItem('cybertech_admin_courses_last_update', new Date().getTime().toString());
+            console.log('Updated timestamp to refresh course data without deleting existing courses');
+            
+            // Immediately check for template updates
+            if (typeof checkAndApplyTemplateUpdates === 'function') {
+                console.log('Checking for template updates on page load...');
+                checkAndApplyTemplateUpdates();
+            }
+            // Force refresh course data
+            if (localStorage.getItem('cybertech_admin_courses')) {
+                console.log('Loading latest course data from admin settings');
+                
+                // Set up a MutationObserver to detect when course content is updated
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'childList' && 
+                            (mutation.target.classList.contains('course-description') || 
+                             mutation.target.classList.contains('module-title') ||
+                             mutation.target.classList.contains('module-duration'))) {
+                            console.log('Course content updated by course-updater.js');
+                        }
+                    });
+                });
+                
+                // Observe the course description and module titles for changes
+                observer.observe(document.getElementById('main-course-description'), { childList: true, subtree: true });
+                document.querySelectorAll('.module-title, .module-duration').forEach(el => {
+                    observer.observe(el, { childList: true, subtree: true });
+                });
+                
+                // Update timestamp to refresh data without deleting courses
+                localStorage.setItem('cybertech_admin_courses_last_update', new Date().getTime().toString());
+                console.log('Updated timestamp to refresh course data without deleting existing courses');
+            }
+        });
+    </script>
+    <style>
+        /* Platform name styling for navigation and footer */
+        .platform-name-styled .cyber-part {
+            color: #4e54c8; /* Blue color */
+            font-weight: 600;
+        }
+        
+        .platform-name-styled .tech-part {
+            color: #43d477; /* Green color */
+            font-weight: 600;
+        }
+        
+        /* Navigation logo styling */
+        .navbar .logo h1 {
+            text-decoration: none;
+        }
+        
+        .navbar .logo h1 a {
+            text-decoration: none;
+        }
+        
+        .navbar .logo h1 .cyber-part {
+            color: #4e54c8; /* Blue color */
+            font-weight: 600;
+        }
+        
+        .navbar .logo h1 .tech-part {
+            color: #43d477; /* Green color */
+            font-weight: 600;
+        }
+        
+        /* Footer logo styling */
+        .footer-col h3 .cyber-part {
+            color: #4e54c8; /* Blue color */
+            font-weight: 600;
+        }
+        
+        .footer-col h3 .tech-part {
+            color: #43d477; /* Green color */
+            font-weight: 600;
+        }
+
+        /* Reading Lesson Styles */
+        .lesson-expandable {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            padding: 5px;
+        }
+        
+        .lesson-expandable:hover {
+            background-color: #f0f7ff;
+            transform: translateX(5px);
+        }
+        
+        .lesson-expandable:hover .fas.fa-file-alt {
+            color: #007bff;
+            transform: scale(1.1);
+        }
+        
+        .expand-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .expand-icon.rotate {
+            transform: rotate(180deg);
+        }
+        
+        .lesson-expanded-content {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .attack-vectors-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .attack-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e9ecef;
+            position: relative;
+        }
+        
+        .attack-icon {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 30px;
+            height: 30px;
+            background: #dc3545;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .attack-card h4 {
+            margin: 0 0 10px 40px;
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .attack-card p {
+            margin: 0 0 15px 40px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .example-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin-left: 40px;
+        }
+        
+        .example-box h5 {
+            margin: 0 0 8px 0;
+            color: #856404;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .example-box h5 i {
+            color: #ffc107;
+        }
+        
+        .example-box p {
+            margin: 0;
+            color: #856404;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <h1 class="platform-name-styled"><a href="index.html"><span class="cyber-part">Cyber</span><span class="tech-part">Tech</span></a></h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" class="nav-link-blue">Home</a></li>
+                <li><a href="index.html#courses" class="nav-link-green active">Courses</a></li>
+                <li><a href="about.html" class="nav-link-green">About</a></li>
+                <li><a href="contact.html" class="nav-link-blue">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Course Header -->
+    <section class="course-header">
+        <div class="container">
+            <div class="course-header-content">
+                <div class="course-badge intermediate small-badge">Intermediate</div>
+                <h1 id="course-title">Social Engineering Defense</h1>
+                <div class="course-meta">
+                    <span id="course-duration"><i class="fas fa-clock"></i> 2.5 hours</span>
+                    <span id="course-enrolled"><i class="fas fa-users"></i> 756 enrolled</span>
+                    <span><i class="fas fa-star"></i> 4.8 (124 reviews)</span>
+                    <span><i class="fas fa-certificate"></i> Certificate Included</span>
+                </div>
+                <p class="course-description" id="main-course-description">
+                    Learn to recognize and counter social engineering attacks that manipulate human psychology to bypass security measures. This intermediate-level course covers attack techniques, psychological principles, and defensive strategies to protect against human-targeted cyber threats. You'll explore the psychological triggers exploited by attackers and develop a deep understanding of various social engineering methods including pretexting, baiting, quid pro quo attacks, and tailgating. Through realistic scenarios and case studies, you'll learn to identify manipulation attempts in various contexts—from phone calls and emails to in-person encounters. The course provides practical frameworks for developing organizational defense strategies, including security awareness programs, verification procedures, and incident response protocols.
+                </p>
+                <div class="course-actions">
+                    <a href="#overview" class="btn btn-primary" onclick="showTab('overview')">Start Learning</a>
+                    <a href="certificate.html" class="btn btn-secondary">Get the Certificate</a>
+                </div>
+
+                <script>
+                    function showTab(tabId) {
+                        // Hide all tab contents
+                        document.querySelectorAll('.tab-content').forEach(content => {
+                            content.classList.remove('active');
+                        });
+                        
+                        // Show selected tab content
+                        document.getElementById(tabId).classList.add('active');
+                        
+                        // Update tab buttons
+                        document.querySelectorAll('.tab-btn').forEach(btn => {
+                            btn.classList.remove('active');
+                            if(btn.getAttribute('data-tab') === tabId) {
+                                btn.classList.add('active');
+                            }
+                        });
+                    }
+                </script>
+            </div>
+            <div class="course-image">
+                <img src="images/Social Enginner.jpg" alt="Social Engineering Defense" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>
+    </section>
+
+    <!-- Course Overview -->
+    <section class="course-overview" id="course-content">
+        <div class="container">
+            <div class="course-tabs">
+                <button class="tab-btn active" data-tab="overview">Overview</button>
+                <button class="tab-btn" data-tab="curriculum">Curriculum</button>
+                <button class="tab-btn" data-tab="reviews">Reviews</button>
+            </div>
+            
+            <div class="tab-content active" id="overview">
+                <h2>Course Overview</h2>
+                <p id="course-overview-text">
+                    Learn to recognize and counter social engineering attacks that manipulate human psychology to bypass security measures. This intermediate-level course covers attack techniques, psychological principles, and defensive strategies to protect against human-targeted cyber threats. You'll explore the psychological triggers exploited by attackers and develop a deep understanding of various social engineering methods including pretexting, baiting, quid pro quo attacks, and tailgating. Through realistic scenarios and case studies, you'll learn to identify manipulation attempts in various contexts—from phone calls and emails to in-person encounters. The course provides practical frameworks for developing organizational defense strategies, including security awareness programs, verification procedures, and incident response protocols.
+                </p>
+                
+                <h3>What You Will Learn</h3>
+                <ul class="course-features">
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>Recognize common social engineering tactics and attack vectors</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>Understand the psychological principles exploited in social engineering</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>Develop effective defense strategies against manipulation attempts</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>Implement verification procedures to counter social engineering attacks</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-check-circle"></i>
+                        <span>Create a security-aware culture within your organization</span>
+                    </li>
+                </ul>
+                
+                <h3>Course Requirements</h3>
+                <ul class="requirements-list">
+                    <li>Basic understanding of cybersecurity concepts</li>
+                    <li>Completion of beginner-level cybersecurity courses recommended</li>
+                    <li>A computer with internet access</li>
+                </ul>
+                
+                <h3>Who This Course is For</h3>
+                <ul class="target-audience">
+                    <li>Security professionals looking to enhance their defense capabilities</li>
+                    <li>Team leaders responsible for organizational security</li>
+                    <li>Employees who handle sensitive information or communications</li>
+                    <li>Anyone interested in protecting themselves from manipulation tactics</li>
+                </ul>
+            </div>
+            
+            <div class="tab-content" id="curriculum">
+                <h2>Course Curriculum</h2>
+                
+                <div class="course-module">
+                    <div class="module-header">
+                        <h3 class="module-title">Module 1: Understanding Social Engineering</h3>
+                        <span class="module-length"><i class="fas fa-clock"></i> <span class="module-duration">35 minutes</span></span>
+                    </div>
+                    <div class="module-content">
+                        <ul class="module-lessons">
+                            <li>
+                                <div class="lesson-info video-lesson">
+                                    <i class="fas fa-play-circle"></i>
+                                    <span>What is Social Engineering?</span>
+                                </div>
+                                <span class="lesson-length">10 min</span>
+                            </li>
+                            <li>
+                                <div class="lesson-info video-lesson">
+                                    <i class="fas fa-play-circle"></i>
+                                    <span>The Psychology Behind Social Engineering</span>
+                                </div>
+                                <span class="lesson-length">15 min</span>
+                            </li>
+                            <li>
+                                <div class="lesson-info reading-lesson" id="attack-vectors-lesson">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span>Common Attack Vectors and Examples</span>
+                                </div>
+                                <span class="lesson-length">10 min</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="course-module">
+                    <div class="module-header">
+                        <h3 class="module-title">Module 2: Social Engineering Attack Methods</h3>
+                        <span class="module-length"><i class="fas fa-clock"></i> <span class="module-duration">35 minutes</span></span>
+                    </div>
+                    <div class="module-content">
+                        <ul class="module-lessons">
+                            <li>
+                                <div class="lesson-info video-lesson">
+                                    <i class="fas fa-play-circle"></i>
+                                    <span>Phishing and Its Variants</span>
+                                </div>
+                                <span class="lesson-length">15 min</span>
+                            </li>
+                            <li>
+                                <div class="lesson-info video-lesson">
+                                    <i class="fas fa-play-circle"></i>
+                                    <span>Pretexting and Impersonation</span>
+                                </div>
+                                <span class="lesson-length">10 min</span>
+                            </li>
+                            <li>
+                                <div class="lesson-info video-lesson">
+                                    <i class="fas fa-play-circle"></i>
+                                    <span>Social Engineering Attack Methods</span>
+                                </div>
+                                <span class="lesson-length">10 min</span>
+                            </li>
+                            <li>
+                                <div class="lesson-info exercise-lesson" id="social-exercise-lesson" onclick="openSocialExercise()">
+                                    <i class="fas fa-puzzle-piece" style="color: #e74c3c !important;"></i>
+                                    <span>Interactive Exercise: Identifying Attack Types</span>
+                                </div>
+                                <span class="lesson-length">10 min</span>
+                                <script>
+                                    // Make functions globally accessible
+                                    window.openSocialExercise = function() {
+                                        console.log('Opening social engineering exercise modal...');
+                                        const modal = document.getElementById('socialExerciseModal');
+                                        if (modal) {
+                                            modal.style.display = 'block';
+                                            document.body.style.overflow = 'hidden';
+                                            
+                                            // Check if user is admin
+                                            const currentUser = JSON.parse(localStorage.getItem('cybertech_user') || '{}');
+                                            console.log('Current user:', currentUser);
+                                            console.log('Is admin?', currentUser.isAdmin);
+                                            
+                                            // If user is admin, always allow retaking
+                                            const isAdmin = currentUser.role === 'admin' || currentUser.isAdmin === true;
+                                            if (isAdmin) {
+                                                console.log('Admin user - allowing exercise retake');
+                                                // Force show intro page for admin immediately
+                                                document.getElementById('socialExerciseIntro').style.display = 'block';
+                                                document.getElementById('socialExerciseQuestions').style.display = 'none';
+                                                document.getElementById('socialExerciseResults').style.display = 'none';
+                                                resetSocialExercise();
+                                            }
+                                            // For regular users, check if they've already completed
+                                            else {
+                                                const existingResults = JSON.parse(localStorage.getItem('cybertech_assessment_results') || '[]');
+                                                
+                                                // Find user's previous result for this exercise
+                                                const userPreviousResult = existingResults.find(result => 
+                                                    result.exerciseName === 'Identifying Attack Types' && 
+                                                    (result.userId === currentUser.id || 
+                                                     result.userId === currentUser.username || 
+                                                     result.name === currentUser.username || 
+                                                     result.name === currentUser.name)
+                                                );
+                                                
+                                                // If user has already completed, show previous results
+                                                if (userPreviousResult) {
+                                                    console.log('User has already completed exercise - showing previous results');
+                                                    showPreviousSocialResults(userPreviousResult);
+                                                }
+                                                // If user hasn't completed yet, start fresh
+                                                else {
+                                                    console.log('New user - starting fresh exercise');
+                                                    resetSocialExercise();
+                                                }
+                                            }
+                                            
+                                            console.log('Social engineering exercise modal opened successfully');
+                                        } else {
+                                            console.error('Social engineering exercise modal not found!');
+                                        }
+                                    };
+
+                                    window.closeSocialExercise = function() {
+                                        const modal = document.getElementById('socialExerciseModal');
+                                        if (modal) {
+                                            modal.style.display = 'none';
+                                            document.body.style.overflow = '';
+                                        }
+                                    };
+
+                                    window.startSocialExercise = function() {
+                                        document.getElementById('socialExerciseIntro').style.display = 'none';
+                                        document.getElementById('socialExerciseQuestions').style.display = 'block';
+                                        showSocialQuestion(0);
+                                    };
+
+                                    // Social engineering exercise questions
+                                    const socialQuestions = [
+                                        {
+                                            question: "Someone calls claiming to be from IT support and asks for your password to 'fix your account'. What type of attack is this?",
+                                            options: [
+                                                "Phishing",
+                                                "Pretexting",
+                                                "Baiting",
+                                                "Quid pro quo"
+                                            ],
+                                            correct: 1,
+                                            explanation: "This is pretexting - the attacker creates a false scenario (being from IT) to gain your trust and obtain sensitive information."
+                                        },
+                                        {
+                                            question: "An email offers you a free gift card if you click a link and enter your details. What type of attack is this?",
+                                            options: [
+                                                "Phishing",
+                                                "Baiting",
+                                                "Pretexting",
+                                                "Authority"
+                                            ],
+                                            correct: 1,
+                                            explanation: "This is baiting - the attacker offers something desirable (free gift card) to entice you into providing information or clicking malicious links."
+                                        },
+                                        {
+                                            question: "A manager asks you to process an urgent payment to a new vendor without following normal procedures. What type of attack is this?",
+                                            options: [
+                                                "Authority",
+                                                "Urgency",
+                                                "Social proof",
+                                                "Reciprocity"
+                                            ],
+                                            correct: 0,
+                                            explanation: "This is an authority attack - the attacker impersonates someone in authority to bypass normal security procedures."
+                                        },
+                                        {
+                                            question: "Someone asks for directions to the nearest coffee shop. Is this likely a social engineering attack?",
+                                            options: [
+                                                "Yes, it's pretexting",
+                                                "Yes, it's baiting",
+                                                "No, it's a legitimate request",
+                                                "Yes, it's authority"
+                                            ],
+                                            correct: 2,
+                                            explanation: "This appears to be a legitimate request for directions. Not every interaction is a social engineering attack."
+                                        },
+                                        {
+                                            question: "A colleague asks you to hold the door open for them as they carry boxes. Is this likely a social engineering attack?",
+                                            options: [
+                                                "Yes, it's tailgating",
+                                                "No, it's a legitimate request",
+                                                "Yes, it's pretexting",
+                                                "Yes, it's authority"
+                                            ],
+                                            correct: 1,
+                                            explanation: "This is likely a legitimate request for help. Tailgating would involve someone following you through a secure door without authorization."
+                                        },
+                                        {
+                                            question: "An email claims your account will be suspended unless you verify your information immediately. What type of attack is this?",
+                                            options: [
+                                                "Urgency",
+                                                "Authority",
+                                                "Fear",
+                                                "All of the above"
+                                            ],
+                                            correct: 3,
+                                            explanation: "This combines urgency (immediate action required), authority (impersonating the service), and fear (account suspension) to manipulate the victim."
+                                        },
+                                        {
+                                            question: "Someone offers to help you carry your bags in exchange for information about your company. What type of attack is this?",
+                                            options: [
+                                                "Quid pro quo",
+                                                "Reciprocity",
+                                                "Baiting",
+                                                "Pretexting"
+                                            ],
+                                            correct: 0,
+                                            explanation: "This is quid pro quo - the attacker offers a service in exchange for information or access."
+                                        },
+                                        {
+                                            question: "A stranger asks to use your phone to make an emergency call. Is this likely a social engineering attack?",
+                                            options: [
+                                                "Yes, they might steal your phone",
+                                                "No, it's a legitimate emergency request",
+                                                "Yes, they might access your data",
+                                                "It depends on the situation"
+                                            ],
+                                            correct: 3,
+                                            explanation: "This could be legitimate or malicious. It's important to assess the situation and maintain control of your device if you decide to help."
+                                        },
+                                        {
+                                            question: "An email from 'PayPal' asks you to click a link to verify your account. What should you do?",
+                                            options: [
+                                                "Click the link immediately",
+                                                "Forward the email to IT",
+                                                "Reply with your account details",
+                                                "Ignore it completely"
+                                            ],
+                                            correct: 1,
+                                            explanation: "Forward suspicious emails to IT for investigation. Never click links in suspicious emails or provide account details via email."
+                                        },
+                                        {
+                                            question: "Someone claiming to be from the IRS calls demanding immediate payment. What type of attack is this?",
+                                            options: [
+                                                "Authority + Urgency",
+                                                "Fear + Authority",
+                                                "Urgency + Fear",
+                                                "All of the above"
+                                            ],
+                                            correct: 3,
+                                            explanation: "This combines authority (impersonating IRS), urgency (immediate payment), and fear (government consequences) to manipulate the victim."
+                                        }
+                                    ];
+
+                                    let currentSocialQuestion = 0;
+                                    let socialScore = 0;
+                                    let socialUserAnswers = [];
+
+                                    // Initialize exercise modal handlers
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        // Close modal when clicking outside
+                                        const modal = document.getElementById('socialExerciseModal');
+                                        if (modal) {
+                                            modal.addEventListener('click', function(e) {
+                                                if (e.target === modal) {
+                                                    closeSocialExercise();
+                                                }
+                                            });
+                                        }
+
+                                        // Close modal on ESC key
+                                        document.addEventListener('keydown', function(e) {
+                                            if (e.key === 'Escape') {
+                                                const modal = document.getElementById('socialExerciseModal');
+                                                if (modal && modal.style.display === 'block') {
+                                                    closeSocialExercise();
+                                                }
+                                            }
+                                        });
+                                    });
+
+                                    window.resetSocialExercise = function() {
+                                        console.log('Resetting social exercise...');
+                                        currentSocialQuestion = 0;
+                                        socialScore = 0;
+                                        socialUserAnswers = [];
+                                        
+                                        // Always show intro page first
+                                        document.getElementById('socialExerciseIntro').style.display = 'block';
+                                        document.getElementById('socialExerciseQuestions').style.display = 'none';
+                                        document.getElementById('socialExerciseResults').style.display = 'none';
+                                        
+                                        // Clear question review
+                                        const questionReview = document.getElementById('socialQuestionReview');
+                                        if (questionReview) {
+                                            questionReview.innerHTML = '';
+                                        }
+                                        
+                                        console.log('Social exercise reset complete - intro page should be visible');
+                                    };
+
+                                    window.showSocialQuestion = function(index) {
+                                        const questionsContainer = document.getElementById('socialExerciseQuestions');
+                                        const question = socialQuestions[index];
+
+                                        const html = `
+                                            <div class="exercise-question">
+                                                <h4>Question ${index + 1} of 10:</h4>
+                                                <p>${question.question}</p>
+                                                <div class="exercise-options">
+                                                    ${question.options.map((option, i) => `
+                                                        <div class="exercise-option" onclick="selectSocialAnswer(${i})">
+                                                            ${option}
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        `;
+
+                                        questionsContainer.innerHTML = html;
+                                    };
+
+                                    window.selectSocialAnswer = function(answerIndex) {
+                                        socialUserAnswers[currentSocialQuestion] = answerIndex;
+                                        if (answerIndex === socialQuestions[currentSocialQuestion].correct) {
+                                            socialScore++;
+                                        }
+
+                                        if (currentSocialQuestion < socialQuestions.length - 1) {
+                                            currentSocialQuestion++;
+                                            showSocialQuestion(currentSocialQuestion);
+                                        } else {
+                                            showSocialResults();
+                                        }
+                                    };
+
+                                    window.showSocialResults = function() {
+                                        const percentage = Math.round((socialScore / socialQuestions.length) * 100);
+                                        
+                                        // Generate feedback message based on score
+                                        let feedbackMessage = '';
+                                        if (percentage >= 80) {
+                                            feedbackMessage = 'Excellent! You have excellent social engineering awareness. You can identify most attack types! 👍';
+                                        } else if (percentage >= 60) {
+                                            feedbackMessage = 'Good job! You have good social engineering awareness, but there\'s room for improvement. 👍';
+                                        } else if (percentage >= 40) {
+                                            feedbackMessage = 'Not bad! You have some social engineering awareness, but you need to learn more. 📚';
+                                        } else {
+                                            feedbackMessage = 'Keep learning! Review the course materials to improve your social engineering awareness. 📚';
+                                        }
+                                        
+                                        // Save result for admin view
+                                        const currentUser = JSON.parse(localStorage.getItem('cybertech_user') || '{}');
+                                            const exerciseResult = {
+                                            name: currentUser.username || currentUser.name || 'Anonymous User',
+                                            email: currentUser.email || 'No email provided',
+                                            userId: currentUser.id || currentUser.username || 'unknown',
+                                                score: percentage,
+                                                dateTaken: new Date().toISOString().split('T')[0],
+                                                category: 'Social Engineering',
+                                                status: percentage >= 50 ? 'passed' : 'failed',
+                                            exerciseName: 'Identifying Attack Types'
+                                            };
+                                            
+                                        // Only save if not admin
+                                        if (!currentUser.isAdmin) {
+                                            const existingResults = JSON.parse(localStorage.getItem('cybertech_assessment_results') || '[]');
+                                            existingResults.push(exerciseResult);
+                                            localStorage.setItem('cybertech_assessment_results', JSON.stringify(existingResults));
+                                        }
+
+                                        // Update results display
+                                        document.getElementById('socialExerciseQuestions').style.display = 'none';
+                                        document.getElementById('socialExerciseResults').style.display = 'block';
+                                        document.getElementById('socialScoreDisplay').textContent = `${socialScore}/${socialQuestions.length}`;
+                                        document.getElementById('socialFeedbackMessage').textContent = feedbackMessage;
+                                        
+                                        // Generate question review
+                                        generateSocialQuestionReview();
+                                    };
+
+                                    window.generateSocialQuestionReview = function() {
+                                        const reviewContainer = document.getElementById('socialQuestionReview');
+                                        let reviewHTML = '<h4>Question Review:</h4>';
+                                        
+                                        socialQuestions.forEach((question, index) => {
+                                            const userAnswer = socialUserAnswers[index];
+                                            const isCorrect = userAnswer === question.correct;
+                                            const userAnswerText = question.options[userAnswer];
+                                            const correctAnswerText = question.options[question.correct];
+                                            
+                                            reviewHTML += `
+                                                <div class="question-item ${isCorrect ? 'correct' : 'incorrect'}">
+                                                    <i class="fas fa-${isCorrect ? 'check' : 'times'} status-icon"></i>
+                                                    <h5>Question ${index + 1}: ${question.question}</h5>
+                                                    <div class="user-answer">Your answer: ${userAnswerText}</div>
+                                                    ${!isCorrect ? `<div class="correct-answer">Correct answer: ${correctAnswerText}</div>` : ''}
+                                                    <div class="explanation">${question.explanation}</div>
+                                                </div>
+                                            `;
+                                        });
+                                        
+                                        reviewContainer.innerHTML = reviewHTML;
+                                    };
+
+                                    window.showPreviousSocialResults = function(previousResult) {
+                                        // Hide intro and questions, show results
+                                        document.getElementById('socialExerciseIntro').style.display = 'none';
+                                        document.getElementById('socialExerciseQuestions').style.display = 'none';
+                                        document.getElementById('socialExerciseResults').style.display = 'block';
+                                        
+                                        // Update score display - convert percentage to X/10 format
+                                        const scorePercentage = previousResult.score;
+                                        const userScore = Math.round((scorePercentage / 100) * 10);
+                                        
+                                        document.getElementById('socialScoreDisplay').textContent = `${userScore}/10`;
+                                        
+                                        // Generate feedback message based on score
+                                        const percentage = previousResult.score;
+                                        let feedbackMessage = '';
+                                        if (percentage >= 80) {
+                                            feedbackMessage = 'Excellent! You have excellent social engineering awareness. You can identify most attack types! 👍';
+                                        } else if (percentage >= 60) {
+                                            feedbackMessage = 'Good job! You have good social engineering awareness, but there\'s room for improvement. 👍';
+                                        } else if (percentage >= 40) {
+                                            feedbackMessage = 'Not bad! You have some social engineering awareness, but you need to learn more. 📚';
+                                        } else {
+                                            feedbackMessage = 'Keep learning! Review the course materials to improve your social engineering awareness. 📚';
+                                        }
+                                        
+                                        document.getElementById('socialFeedbackMessage').textContent = feedbackMessage;
+                                        
+                                        // Show previous results message (remove any existing ones first)
+                                        const resultsContainer = document.getElementById('socialExerciseResults');
+                                        
+                                        // Remove any existing previous result messages
+                                        const existingMessages = resultsContainer.querySelectorAll('[data-previous-result]');
+                                        existingMessages.forEach(msg => msg.remove());
+                                        
+                                        const previousResultsMessage = document.createElement('div');
+                                        previousResultsMessage.setAttribute('data-previous-result', 'true');
+                                        previousResultsMessage.innerHTML = `
+                                            <div style="background: #e3f2fd; border: 1px solid #2196f3; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                                                <i class="fas fa-info-circle" style="color: #2196f3;"></i>
+                                                <strong>Previous Result:</strong> You completed this exercise on ${previousResult.dateTaken} with a score of ${userScore}/10 (${percentage}%).
+                                            </div>
+                                        `;
+                                        resultsContainer.insertBefore(previousResultsMessage, resultsContainer.firstChild);
+                                    };
+                                </script>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+
+            </div>
+            
+
+            
+            <div class="tab-content" id="reviews">
+                <h2>Student Reviews</h2>
+                
+                <!-- Review Form -->
+                <div class="review-form-container" id="reviewFormContainer">
+                    <h3>Rate This Course</h3>
+                    <p>Share your experience with CyberTech</p>
+                    
+                    <form id="reviewForm" class="review-form">
+                        <div class="rating-input">
+                            <p>Your Rating:</p>
+                            <div class="star-rating">
+                                <i class="far fa-star" data-rating="1"></i>
+                                <i class="far fa-star" data-rating="2"></i>
+                                <i class="far fa-star" data-rating="3"></i>
+                                <i class="far fa-star" data-rating="4"></i>
+                                <i class="far fa-star" data-rating="5"></i>
+                                <input type="hidden" name="rating" id="selectedRating" value="0">
+                            </div>
+                        </div>
+                        
+                        <div class="comment-input">
+                            <label for="reviewComment">Your Comment (Optional):</label>
+                            <textarea id="reviewComment" name="comment" rows="4" placeholder="Share your thoughts about this course..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                    </form>
+                </div>
+                
+                <style>
+                    /* Review Form Styles */
+                    .review-form-container {
+                        background-color: #f8f9fa;
+                        border-radius: 10px;
+                        padding: 20px;
+                        margin-bottom: 30px;
+                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                    }
+                    
+                    .review-form-container h3 {
+                        margin-bottom: 5px;
+                        color: #333;
+                    }
+                    
+                    .review-form-container p {
+                        color: #666;
+                        margin-bottom: 20px;
+                    }
+                    
+                    .review-form {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 20px;
+                    }
+                    
+                    .rating-input p {
+                        margin-bottom: 10px;
+                        font-weight: 500;
+                    }
+                    
+                    .star-rating {
+                        display: flex;
+                        gap: 5px;
+                        font-size: 24px;
+                        color: #ffc107;
+                        cursor: pointer;
+                    }
+                    
+                    .star-rating i:hover,
+                    .star-rating i.fas {
+                        color: #ffc107;
+                    }
+                    
+                    .comment-input label {
+                        display: block;
+                        margin-bottom: 10px;
+                        font-weight: 500;
+                    }
+                    
+                    .comment-input textarea {
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid #ddd;
+                        border-radius: 5px;
+                        resize: vertical;
+                        font-family: 'Poppins', sans-serif;
+                    }
+                    
+                    .review-form button {
+                        align-self: flex-start;
+                        padding: 10px 20px;
+                    }
+                    
+                    .review-success {
+                        background-color: #d4edda;
+                        color: #155724;
+                        padding: 15px;
+                        border-radius: 5px;
+                        margin-bottom: 20px;
+                        text-align: center;
+                    }
+                </style>
+                
+                <div class="review-summary">
+                    <div class="review-average">
+                        <span class="rating">4.7</span>
+                        <div class="stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <span class="total-reviews">132 reviews</span>
+                    </div>
+                    <div class="rating-bars">
+                        <div class="rating-bar">
+                            <span class="rating-label">5 stars</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 75%;"></div>
+                            </div>
+                            <span class="rating-percent">75%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <span class="rating-label">4 stars</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 20%;"></div>
+                            </div>
+                            <span class="rating-percent">20%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <span class="rating-label">3 stars</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 3%;"></div>
+                            </div>
+                            <span class="rating-percent">3%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <span class="rating-label">2 stars</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 1%;"></div>
+                            </div>
+                            <span class="rating-percent">1%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <span class="rating-label">1 star</span>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 1%;"></div>
+                            </div>
+                            <span class="rating-percent">1%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="review-list" id="review-page-1">
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Mark Johnson</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">2 weeks ago</span>
+                        </div>
+                        <p class="review-text">
+                            This course completely changed how I view everyday interactions. The simulation exercises were particularly eye-opening. I've already implemented several verification procedures at our company.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Rachel Kim</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">1 month ago</span>
+                        </div>
+                        <p class="review-text">
+                            As an IT manager, I found the organizational defense module incredibly valuable. Jessica's approach to building a security culture is practical and effective.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Carlos Rodriguez</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="review-date">2 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            Solid course with great real-world examples. The psychological insights were valuable and gave me a deeper understanding of social engineering attacks.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="review-list" id="review-page-2" style="display: none;">
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Emma Wilson</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">2.5 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            The pretexting and impersonation module was particularly enlightening. It helped me understand how attackers craft convincing scenarios.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>John Smith</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="review-date">3 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            Great course for understanding social engineering tactics. The interactive exercises really helped cement the concepts.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Anna Lee</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">3.5 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            The section on building a security-conscious culture was invaluable for our organization. Highly recommended for team leaders.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="review-list" id="review-page-3" style="display: none;">
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Michael Chang</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">4 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            The case studies were eye-opening. They showed how even experienced professionals can fall victim to social engineering attacks.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Sarah Thompson</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">4.5 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            Excellent training on recognizing manipulation tactics. The verification procedures section was particularly useful.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>David Chen</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="review-date">5 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            The practical defense strategies were well-explained and easy to implement. A must-take course for security professionals.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="review-list" id="review-page-4" style="display: none;">
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Lisa Martinez</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">5.5 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            The training program templates have been incredibly helpful in developing our company's security awareness program.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>James Wilson</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="review-date">6 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            Comprehensive coverage of social engineering techniques. The simulation exercises were particularly valuable.
+                        </p>
+                    </div>
+                    
+                    <div class="review-item">
+                        <div class="reviewer-info">
+                            <h4>Emily Park</h4>
+                            <div class="review-stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="review-date">6.5 months ago</span>
+                        </div>
+                        <p class="review-text">
+                            The psychological aspects of social engineering were fascinating. Great insights into human behavior and security.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="review-pagination">
+                    <div class="pagination-dots">
+                        <span class="dot active" onclick="showReviewPage(1)"></span>
+                        <span class="dot" onclick="showReviewPage(2)"></span>
+                        <span class="dot" onclick="showReviewPage(3)"></span>
+                        <span class="dot" onclick="showReviewPage(4)"></span>
+                    </div>
+                </div>
+
+                <script>
+                    function showReviewPage(pageNumber) {
+                        // Hide all review pages
+                        document.querySelectorAll('.review-list').forEach(page => {
+                            page.style.display = 'none';
+                        });
+                        
+                        // Show selected page
+                        document.getElementById('review-page-' + pageNumber).style.display = 'block';
+                        
+                        // Update active dot
+                        document.querySelectorAll('.dot').forEach(dot => {
+                            dot.classList.remove('active');
+                        });
+                        document.querySelectorAll('.dot')[pageNumber - 1].classList.add('active');
+                    }
+                </script>
+                <style>
+                    .pagination-dots {
+                        display: flex;
+                        justify-content: center;
+                        gap: 8px;
+                        margin: 20px 0;
+                    }
+                    .pagination-dots .dot {
+                        width: 12px;
+                        height: 12px;
+                        background-color: #FFE600;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        transition: background-color 0.3s ease;
+                    }
+                    .pagination-dots .dot.active {
+                        background-color: #FF0000;
+                    }
+                </style>
+            </div>
+        </div>
+    </section>
+
+    <!-- Related Courses -->
+    <section class="related-courses">
+        <div class="container">
+            <h2>Related Courses</h2>
+                <div class="course-card">
+                    <div class="course-image">
+                        <img src="images/Data Protection.jpg" alt="Data Protection">
+                        <div class="course-badge intermediate">Intermediate</div>
+                    </div>
+                    <div class="course-content">
+                        <h3>Data Protection Essentials</h3>
+                        <p>Advanced techniques for protecting sensitive data and ensuring privacy compliance.</p>
+                        <div class="course-meta">
+                            <span><i class="fas fa-clock"></i> 3 hours</span>
+                            <span><i class="fas fa-users"></i> 987 enrolled</span>
+                        </div>
+                        <a href="course-data-protection.html" class="btn btn-course">Start Course</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enrollment CTA -->
+    <section class="course-cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to strengthen your social engineering defense skills?</h2>
+                <p>Join 756+ professionals who have already completed this course</p>
+                <a href="#course-content" class="btn btn-cta">Enroll Now</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3 class="platform-name-styled"><span class="cyber-part">Cyber</span><span class="tech-part">Tech</span></h3>
+                    <p class="platform-description">An interactive cybersecurity awareness platform designed to empower employees with practical skills to navigate the digital world safely.</p>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/profile.php?id=61578401008909"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="https://www.instagram.com/noor.dmin/?igsh=cnp1d2l3cHp6eTdn#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#courses">Courses</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Courses</h4>
+                    <ul>
+                        <li><a href="course-phishing.html">Phishing Awareness</a></li>
+                        <li><a href="course-password-security.html">Password Security</a></li>
+                        <li><a href="course-data-protection.html">Data Protection</a></li>
+                        <li><a href="course-social-engineering.html">Social Engineering</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact Us</h4>
+                    <ul class="contact-info">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Cyber Street, Tech City</li>
+                        <li><i class="fas fa-phone"></i> +44 20 7123 4567</li>
+                        <li><i class="fas fa-envelope"></i> Admin@cybertech.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 <span class="platform-name platform-name-styled"><span class="cyber-part">Cyber</span><span class="tech-part">Tech</span></span>. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Attack Vectors Modal -->
+    <div id="attackVectorsModal" class="reading-modal">
+        <div class="reading-modal-content">
+            <div class="reading-modal-header">
+                <h3>Common Attack Vectors and Examples</h3>
+                <span class="reading-modal-close" onclick="closeAttackVectorsModal()">&times;</span>
+            </div>
+            <div class="attack-vectors-container">
+                <div class="attack-card">
+                    <div class="attack-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h4>Email-Based Attacks</h4>
+                    <p>Phishing emails that impersonate legitimate organizations to steal credentials or install malware.</p>
+                    <div class="example-box">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Example:</h5>
+                        <p>An email claiming to be from your bank asking you to verify your account details by clicking a link.</p>
+                    </div>
+                </div>
+
+                <div class="attack-card">
+                    <div class="attack-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h4>Phone-Based Attacks (Vishing)</h4>
+                    <p>Voice phishing attacks where attackers call victims pretending to be from legitimate organizations.</p>
+                    <div class="example-box">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Example:</h5>
+                        <p>A caller claiming to be from Microsoft support asking for remote access to "fix" your computer.</p>
+                    </div>
+                </div>
+
+                <div class="attack-card">
+                    <div class="attack-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h4>SMS-Based Attacks (Smishing)</h4>
+                    <p>Text message attacks that trick users into clicking malicious links or providing sensitive information.</p>
+                    <div class="example-box">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Example:</h5>
+                        <p>A text claiming you've won a prize and need to click a link to claim it.</p>
+                    </div>
+                </div>
+
+                <div class="attack-card">
+                    <div class="attack-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h4>Impersonation Attacks</h4>
+                    <p>Attackers pretend to be someone in authority to gain access or information.</p>
+                    <div class="example-box">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Example:</h5>
+                        <p>Someone claiming to be a company executive asking for urgent wire transfers.</p>
+                    </div>
+                </div>
+
+                <div class="attack-card">
+                    <div class="attack-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <h4>Baiting Attacks</h4>
+                    <p>Using physical media or offers to lure victims into compromising their security.</p>
+                    <div class="example-box">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Example:</h5>
+                        <p>Leaving infected USB drives in public places hoping someone will plug them in.</p>
+                    </div>
+                </div>
+
+                <div class="attack-card">
+                    <div class="attack-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h4>Quid Pro Quo Attacks</h4>
+                    <p>Offering a service in exchange for information or access.</p>
+                    <div class="example-box">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Example:</h5>
+                        <p>An attacker offers free IT support in exchange for login credentials.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="video-modal">
+        <div class="video-modal-content">
+            <div class="video-modal-header">
+                <h3 id="videoTitle">Video Title</h3>
+                <span class="close-video-modal" onclick="closeVideoModal()">&times;</span>
+            </div>
+            <div class="video-modal-body">
+                <div class="video-container">
+                    <video id="courseVideo" controls preload="metadata">
+                        <source src="" type="video/mp4">
+                        <p>Your browser does not support the video tag.</p>
+                    </video>
+                </div>
+                <div class="video-info">
+                    <p id="videoDuration">Duration: <span id="durationText">0 min</span></p>
+                    <p>Click play to start the lesson. You can pause and resume at any time.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    
+    <style>
+        /* Reading Modal Styles */
+        .reading-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow: auto;
+        }
+        
+        .reading-modal-content {
+            position: relative;
+            background-color: #fff;
+            margin: 5% auto;
+            width: 90%;
+            max-width: 1200px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .reading-modal-header {
+            background-color: #4e54c8;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .reading-modal-header h3 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .reading-modal-close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .reading-modal-close:hover {
+            color: #ddd;
+        }
+        
+        .attack-vectors-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .attack-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e9ecef;
+            position: relative;
+        }
+        
+        .attack-icon {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 40px;
+            height: 40px;
+            background: #4e54c8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .attack-card h4 {
+            margin: 0 0 15px 60px;
+            color: #333;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .attack-card p {
+            margin: 0 0 20px 60px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .example-box {
+            background: #f8f9fa;
+            border-left: 4px solid #4e54c8;
+            padding: 15px;
+            margin-left: 60px;
+            border-radius: 5px;
+        }
+        
+        .example-box h5 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .example-box h5 i {
+            color: #ffc107;
+        }
+        
+        .example-box p {
+            margin: 0;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Reading Lesson Styles */
+        .reading-lesson {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .reading-lesson:hover {
+            background-color: #f0f7ff;
+            transform: translateX(5px);
+        }
+        
+        .reading-lesson .fa-file-alt {
+            color: #e74c3c;
+            transition: transform 0.3s ease;
+        }
+        
+        .reading-lesson:hover .fa-file-alt {
+            transform: scale(1.1);
+        }
+
+        /* Exercise lesson icon styling */
+        .exercise-lesson .fa-puzzle-piece {
+            color: #e74c3c !important;
+            transition: transform 0.3s ease;
+        }
+        
+        .exercise-lesson:hover .fa-puzzle-piece {
+            transform: scale(1.1);
+        }
+
+        /* Force red color for social engineering exercise icon with maximum specificity */
+        .lesson-info.exercise-lesson i.fas.fa-puzzle-piece {
+            color: #e74c3c !important;
+        }
+
+        /* Video Modal Styles */
+        .video-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow: auto;
+        }
+        
+        .video-modal-content {
+            position: relative;
+            background-color: #fff;
+            margin: 5% auto;
+            width: 80%;
+            max-width: 900px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .video-modal-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .video-modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+        
+        .close-video-modal {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close-video-modal:hover {
+            color: #ddd;
+        }
+        
+        .video-modal-body {
+            padding: 0;
+        }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            background-color: #000;
+        }
+        
+        .video-container video {
+            width: 100%;
+            display: block;
+        }
+        
+        .video-info {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .video-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+        
+        /* Video Lesson Style */
+        .video-lesson {
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .video-lesson:hover {
+            background-color: rgba(78, 84, 200, 0.1);
+        }
+        
+        .video-lesson .fas {
+            color: #e74c3c;
+        }
+    </style>
+    
+    <script>
+        // Function to dynamically rebuild the entire course structure from admin data
+        function updateCourseModules() {
+            console.log('🔄 Rebuilding Social Engineering course structure from admin data...');
+            
+            const courses = JSON.parse(localStorage.getItem('cybertech_admin_courses') || '[]');
+            const socialCourse = courses.find(c => c.id === 3);
+            
+            if (socialCourse && socialCourse.modules) {
+                console.log('Found Social Engineering course:', socialCourse.modules);
+                
+                // Get the course content container
+                const mainContent = document.querySelector('#curriculum');
+                if (!mainContent) {
+                    console.error('❌ Course content container not found');
+                    return;
+                }
+                
+                // Clear existing content but preserve the heading
+                const heading = mainContent.querySelector('h2');
+                mainContent.innerHTML = '';
+                if (heading) {
+                    mainContent.appendChild(heading);
+                }
+                
+                // Build modules dynamically
+                socialCourse.modules.forEach((module, index) => {
+                    const moduleDiv = document.createElement('div');
+                    moduleDiv.className = 'course-module';
+                    
+                    const moduleHTML = `
+                        <div class="module-header">
+                            <h3 class="module-title">Module ${index + 1}: ${module.title}</h3>
+                            <span class="module-length"><i class="fas fa-clock"></i> <span class="module-duration">${module.duration}</span></span>
+                        </div>
+                        <div class="module-content">
+                            <ul class="module-lessons">
+                                ${module.lessons.map(lesson => `
+                                    <li>
+                                        <div class="lesson-info ${lesson.type === 'reading' ? 'reading-lesson' : lesson.type === 'interactive' ? '' : 'video-lesson'}" 
+                                             ${lesson.type === 'reading' ? 'onclick="openAttackVectorsModal()"' : lesson.type === 'interactive' ? 'id="social-exercise-lesson" style="cursor: pointer;"' : 'onclick="openVideoModal(this.querySelector(\'span\').textContent, null, this.closest(\'li\').querySelector(\'.lesson-length\').textContent)"'}>
+                                            <i class="fas ${lesson.type === 'reading' ? 'fa-file-alt' : lesson.type === 'interactive' ? 'fa-puzzle-piece' : 'fa-play-circle'}"></i>
+                                            <span>${lesson.title}</span>
+                                        </div>
+                                        <span class="lesson-length">${lesson.duration}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                    
+                    moduleDiv.innerHTML = moduleHTML;
+                    mainContent.appendChild(moduleDiv);
+                    console.log(`✅ Added module: ${module.title}`);
+                });
+                
+                // Re-attach event listeners
+                const videoLessons = mainContent.querySelectorAll('.video-lesson');
+                videoLessons.forEach(lesson => {
+                    // Skip if this is a reading lesson
+                    if (lesson.querySelector('span').textContent === 'Common Attack Vectors and Examples') {
+                        lesson.classList.remove('video-lesson');
+                        lesson.classList.add('lesson-expandable');
+                        lesson.setAttribute('onclick', 'toggleReadingLesson(this)');
+                        
+                        // Update icon
+                        const icon = lesson.querySelector('i:first-child');
+                        if (icon) {
+                            icon.className = 'fas fa-file-alt';
+                        }
+                        
+                        // Add expand icon if needed
+                        let expandIcon = lesson.querySelector('.expand-icon');
+                        if (!expandIcon) {
+                            expandIcon = document.createElement('i');
+                            expandIcon.className = 'fas fa-chevron-down expand-icon';
+                            lesson.appendChild(expandIcon);
+                        }
+                        return;
+                    }
+                    
+                    lesson.addEventListener('click', function() {
+                        const title = this.querySelector('span').textContent;
+                        const duration = this.closest('li').querySelector('.lesson-length').textContent;
+                        openVideoModal(title, null, duration);
+                    });
+                });
+                
+                const exerciseLessons = mainContent.querySelectorAll('#social-exercise-lesson');
+                exerciseLessons.forEach(lesson => {
+                    lesson.addEventListener('click', openSocialExercise);
+                });
+                
+                const readingLessons = mainContent.querySelectorAll('.lesson-expandable');
+                readingLessons.forEach(lesson => {
+                    lesson.addEventListener('click', function() {
+                        toggleReadingLesson(this);
+                    });
+                });
+                
+                console.log('✅ Course structure rebuilt successfully');
+            } else {
+                console.log('❌ Social Engineering course not found in admin data');
+            }
+        }
+
+        // Review Form Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update course modules from admin data
+            updateCourseModules();
+            
+            // Block videos and ensure proper setup for reading lessons
+            blockVideoForReadingLessons();
+            ensureReadingLessons();
+            
+            // Override direct-lesson-injector behavior for attack vectors lesson
+            function overrideAttackVectorsLesson() {
+                const attackVectorsLesson = document.querySelector('.lesson-info span');
+                if (attackVectorsLesson && attackVectorsLesson.textContent === 'Common Attack Vectors and Examples') {
+                    const lessonDiv = attackVectorsLesson.closest('.lesson-info');
+                    if (lessonDiv) {
+                        // Remove video classes
+                        lessonDiv.classList.remove('video-lesson');
+                        lessonDiv.classList.add('reading-lesson');
+                        
+                        // Update icon
+                        const icon = lessonDiv.querySelector('i:first-child');
+                        if (icon) {
+                            icon.className = 'fas fa-file-alt';
+                        }
+                        
+                        // Remove any existing onclick and add new one
+                        lessonDiv.removeAttribute('onclick');
+                        lessonDiv.onclick = function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openAttackVectorsModal();
+                            return false;
+                        };
+                        
+                        console.log('✅ Attack vectors lesson override applied');
+                    }
+                }
+            }
+            
+            // Apply override immediately and periodically
+            overrideAttackVectorsLesson();
+            setInterval(overrideAttackVectorsLesson, 2000);
+            
+            // Add specific event listener for attack vectors lesson
+            setTimeout(() => {
+                const attackVectorsLesson = document.getElementById('attack-vectors-lesson');
+                if (attackVectorsLesson) {
+                    attackVectorsLesson.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openAttackVectorsModal();
+                        return false;
+                    });
+                    console.log('✅ Attack vectors lesson event listener added');
+                }
+            }, 1000);
+            
+            // Ensure attack vectors lesson is properly configured
+            setTimeout(() => {
+                const attackVectorsLesson = document.querySelector('.lesson-info span');
+                if (attackVectorsLesson && attackVectorsLesson.textContent === 'Common Attack Vectors and Examples') {
+                    const lessonDiv = attackVectorsLesson.closest('.lesson-info');
+                    if (lessonDiv) {
+                        // Remove video classes
+                        lessonDiv.classList.remove('video-lesson');
+                        lessonDiv.classList.add('reading-lesson');
+                        
+                        // Update icon
+                        const icon = lessonDiv.querySelector('i:first-child');
+                        if (icon) {
+                            icon.className = 'fas fa-file-alt';
+                        }
+                        
+                        // Remove any existing onclick and add new one
+                        lessonDiv.removeAttribute('onclick');
+                        lessonDiv.onclick = function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            openAttackVectorsModal();
+                            return false;
+                        };
+                        
+                        console.log('✅ Attack vectors lesson properly configured');
+                    }
+                }
+            }, 1000);
+            
+            // Set up periodic refresh of course modules
+            setInterval(updateCourseModules, 5000);
+            
+            // Listen for admin course updates
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'cybertech_admin_courses' || e.key === 'cybertech_admin_courses_last_update') {
+                    console.log('Admin course data updated, refreshing modules...');
+                    setTimeout(updateCourseModules, 1000);
+                }
+            });
+            
+            // Star rating functionality
+            const stars = document.querySelectorAll('.star-rating i');
+            const ratingInput = document.getElementById('selectedRating');
+            
+            stars.forEach(star => {
+                star.addEventListener('mouseover', function() {
+                    const rating = this.dataset.rating;
+                    highlightStars(rating);
+                });
+                
+                star.addEventListener('mouseout', function() {
+                    const currentRating = ratingInput.value;
+                    highlightStars(currentRating);
+                });
+                
+                star.addEventListener('click', function() {
+                    const rating = this.dataset.rating;
+                    ratingInput.value = rating;
+                    highlightStars(rating);
+                });
+            });
+            
+            function highlightStars(rating) {
+                stars.forEach(star => {
+                    if (star.dataset.rating <= rating) {
+                        star.classList.remove('far');
+                        star.classList.add('fas');
+                    } else {
+                        star.classList.remove('fas');
+                        star.classList.add('far');
+                    }
+                });
+            }
+            
+            // Form submission
+            const form = document.getElementById('reviewForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const rating = ratingInput.value;
+                const comment = document.getElementById('reviewComment').value;
+                
+                if (rating === '0') {
+                    alert('Please select a rating before submitting.');
+                    return;
+                }
+                
+                // Get logged-in user information
+                const currentUser = JSON.parse(localStorage.getItem('cybertech_user') || '{}');
+                const userName = currentUser.username || currentUser.name || 'Anonymous User';
+                const userEmail = currentUser.email || 'No email provided';
+                
+                // Submit review using the global function to ensure it appears at the top for admin
+                if (typeof submitUserReview === 'function') {
+                    submitUserReview(userName, userEmail, 'social', rating, comment || 'No comment provided');
+                } else {
+                    // Fallback if submitUserReview function is not available
+                    const feedbackData = {
+                        name: userName,
+                        email: userEmail,
+                        course: 'social',
+                        rating: rating,
+                        comment: comment || 'No comment provided',
+                        timestamp: new Date().toISOString(),
+                        isNewUserReview: true
+                    };
+                    
+                    // Send to admin feedback system
+                    const existingFeedback = JSON.parse(localStorage.getItem('cybertech_feedback') || '[]');
+                    existingFeedback.unshift(feedbackData); // Add to beginning
+                    localStorage.setItem('cybertech_feedback', JSON.stringify(existingFeedback));
+                    
+                    // Store for cross-page communication
+                    localStorage.setItem('new_user_review', JSON.stringify(feedbackData));
+                }
+                
+                // Show thank you message temporarily
+                form.innerHTML = `
+                    <div class="review-success">
+                        <i class="fas fa-check-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                        <h3>Thank You for Your Feedback!</h3>
+                        <p>Your review has been submitted successfully and sent to CyberTech admin.</p>
+                    </div>
+                `;
+                
+                // After 5 seconds, show the review form again
+                setTimeout(() => {
+                    // Reset the form
+                    form.innerHTML = `
+                        <div class="rating-input">
+                            <p>Your Rating:</p>
+                            <div class="star-rating">
+                                <i class="far fa-star" data-rating="1"></i>
+                                <i class="far fa-star" data-rating="2"></i>
+                                <i class="far fa-star" data-rating="3"></i>
+                                <i class="far fa-star" data-rating="4"></i>
+                                <i class="far fa-star" data-rating="5"></i>
+                                <input type="hidden" name="rating" id="selectedRating" value="0">
+                            </div>
+                        </div>
+                        
+                        <div class="comment-input">
+                            <label for="reviewComment">Your Comment (Optional):</label>
+                            <textarea id="reviewComment" name="comment" rows="4" placeholder="Share your thoughts about this course..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                    `;
+                    
+                    // Reinitialize the star rating functionality
+                    const newStars = document.querySelectorAll('.star-rating i');
+                    const newRatingInput = document.getElementById('selectedRating');
+                    
+                    newStars.forEach(star => {
+                        star.addEventListener('mouseover', function() {
+                            const rating = this.dataset.rating;
+                            highlightStars(rating);
+                        });
+                        
+                        star.addEventListener('mouseout', function() {
+                            const currentRating = newRatingInput.value;
+                            highlightStars(currentRating);
+                        });
+                        
+                        star.addEventListener('click', function() {
+                            const rating = this.dataset.rating;
+                            newRatingInput.value = rating;
+                            highlightStars(rating);
+                        });
+                    });
+                    
+                    // Reattach the form submission event
+                    const newForm = document.getElementById('reviewForm');
+                    if (newForm) {
+                        newForm.addEventListener('submit', arguments.callee);
+                    }
+                }, 5000); // 5 seconds
+            });
+        });
+
+        // Video Modal Functions
+        function openVideoModal(title, videoId, duration) {
+            // Block video for reading lessons
+            if (title === 'Common Attack Vectors and Examples') {
+                console.log('🚫 Blocking video for reading lesson:', title);
+                const lessonElement = document.querySelector('.lesson-info span').textContent === title;
+                if (lessonElement) {
+                    toggleReadingLesson(lessonElement.parentElement);
+                }
+                return;
+            }
+
+            const modal = document.getElementById('videoModal');
+            const videoTitle = document.getElementById('videoTitle');
+            const durationText = document.getElementById('durationText');
+            const video = document.getElementById('courseVideo');
+            
+            // Set video details
+            videoTitle.textContent = title;
+            durationText.textContent = duration + ' min';
+            
+            console.log('Looking for video with title:', title);
+            
+            // Try to load video from user videos (uploaded by admin)
+            const userVideos = JSON.parse(localStorage.getItem('cybertech_user_videos') || '[]');
+            console.log('Available user videos:', userVideos);
+            
+            // PRIORITIZE UPLOADED VIDEOS OVER SAMPLE VIDEOS
+            
+            // Strategy 1: Find uploaded videos with exact title match
+            let matchedVideo = userVideos.find(v => 
+                v.isUploadedFile === true &&
+                v.title.toLowerCase() === title.toLowerCase()
+            );
+            
+            // Strategy 2: Find uploaded videos with partial title match
+            if (!matchedVideo) {
+                matchedVideo = userVideos.find(v => 
+                    v.isUploadedFile === true &&
+                    (v.title.toLowerCase().includes(title.toLowerCase()) ||
+                     title.toLowerCase().includes(v.title.toLowerCase()))
+                );
+            }
+            
+            // Strategy 3: Find any uploaded video for this course
+            if (!matchedVideo) {
+                matchedVideo = userVideos.find(v => 
+                    v.isUploadedFile === true &&
+                    v.courseName && v.courseName.toLowerCase().includes('social engineering')
+                );
+            }
+            
+            // Strategy 4: Find any uploaded video at all
+            if (!matchedVideo) {
+                matchedVideo = userVideos.find(v => v.isUploadedFile === true);
+            }
+            
+            // FALLBACK TO SAMPLE VIDEOS ONLY IF NO UPLOADED VIDEOS EXIST
+            
+            // Strategy 5: Sample videos - exact title match
+            if (!matchedVideo) {
+                matchedVideo = userVideos.find(v => 
+                    v.title.toLowerCase() === title.toLowerCase()
+                );
+            }
+            
+            // Strategy 6: Sample videos - partial title match
+            if (!matchedVideo) {
+                matchedVideo = userVideos.find(v => 
+                    v.title.toLowerCase().includes(title.toLowerCase()) ||
+                    title.toLowerCase().includes(v.title.toLowerCase())
+                );
+            }
+            
+            // Strategy 7: Sample videos - lesson name match
+            if (!matchedVideo) {
+                matchedVideo = userVideos.find(v => 
+                    v.lessonName && v.lessonName.toLowerCase().includes(title.toLowerCase())
+                );
+            }
+            
+            // Strategy 8: Sample videos - any from this course
+            if (!matchedVideo) {
+                matchedVideo = userVideos.find(v => 
+                    v.courseName && v.courseName.toLowerCase().includes('social engineering')
+                );
+            }
+            
+            console.log('Matched video:', matchedVideo);
+            
+            if (matchedVideo && matchedVideo.videoUrl) {
+                if (matchedVideo.isUploadedFile) {
+                    console.log('✅ USING ADMIN UPLOADED VIDEO:', matchedVideo.title);
+                } else {
+                    console.log('⚠️ Using sample video:', matchedVideo.title);
+                }
+                
+                // Set video source
+                video.src = matchedVideo.videoUrl;
+            } else {
+                // Fallback to default video
+                console.log('⚠️ No matching video found, using default sample');
+                video.src = 'https://www.w3schools.com/html/mov_bbb.mp4';
+            }
+            
+            // Show modal
+            modal.style.display = 'block';
+            
+            // Try to autoplay
+            video.play().catch(e => {
+                console.log('Autoplay prevented:', e);
+            });
+        }
+        
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            const video = document.getElementById('courseVideo');
+            
+            // Pause and reset video
+            video.pause();
+            video.currentTime = 0;
+            
+            // Hide modal
+            modal.style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('videoModal');
+            if (event.target === modal) {
+                closeVideoModal();
+            }
+        }
+        
+        // Listen for template updates
+        window.addEventListener('storage', function(event) {
+            if (event.key === 'cybertech_overview_templates_last_update') {
+                console.log('Template updates detected, refreshing course content...');
+                setTimeout(() => {
+                    if (typeof checkAndApplyTemplateUpdates === 'function') {
+                        checkAndApplyTemplateUpdates();
+                    }
+                }, 500);
+            }
+        });
+    </script>
+
+    <!-- Social Engineering Exercise Modal -->
+    <div id="socialExerciseModal" class="exercise-modal">
+        <div class="exercise-modal-content">
+            <div class="exercise-modal-header">
+                <h2>Interactive Exercise: Identifying Attack Types</h2>
+                <span class="exercise-modal-close" onclick="closeSocialExercise()">&times;</span>
+            </div>
+            
+            <!-- Exercise Intro -->
+            <div id="socialExerciseIntro" class="exercise-section">
+                <div class="exercise-intro-content">
+                    <div class="exercise-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Test Your Social Engineering Awareness</h3>
+                    <p>You'll be shown 10 different scenarios. Your task is to identify the type of social engineering attack or determine if it's a legitimate request.</p>
+                    
+                    <div class="exercise-instructions">
+                        <h4>Consider these factors:</h4>
+                        <ul>
+                            <li>Type of social engineering attack (pretexting, baiting, authority, etc.)</li>
+                            <li>Whether the request is legitimate or suspicious</li>
+                            <li>Red flags and warning signs</li>
+                            <li>Common manipulation techniques</li>
+                            <li>How to respond appropriately</li>
+                        </ul>
+                    </div>
+                    
+                    <button onclick="startSocialExercise()" class="btn btn-primary">Start Exercise</button>
+                </div>
+            </div>
+            
+            <!-- Exercise Questions -->
+            <div id="socialExerciseQuestions" class="exercise-section" style="display: none;">
+                <!-- Questions will be dynamically inserted here -->
+            </div>
+            
+            <!-- Exercise Results -->
+            <div id="socialExerciseResults" class="exercise-section" style="display: none;">
+                <div class="exercise-results-content">
+                    <div class="exercise-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h3>Exercise Complete!</h3>
+                    
+                    <div class="score-display">
+                        <div class="score-number">
+                            <span id="socialScoreDisplay">0/10</span>
+                        </div>
+                        <p id="socialFeedbackMessage">Score message will appear here</p>
+                    </div>
+                    
+                    <div id="socialQuestionReview" class="question-review">
+                        <!-- Question review will be dynamically inserted here -->
+                    </div>
+                    
+                    <button onclick="closeSocialExercise()" class="btn btn-primary">Close Exercise</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Social Engineering Exercise Modal Styles */
+        .exercise-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            overflow-y: auto;
+        }
+
+        .exercise-modal-content {
+            background: white;
+            width: 90%;
+            max-width: 800px;
+            margin: 40px auto;
+            border-radius: 12px;
+            position: relative;
+            padding: 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .exercise-modal-header {
+            background: #6900cc;
+            color: white;
+            padding: 20px 24px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .exercise-modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .exercise-modal-close {
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background 0.3s ease;
+        }
+
+        .exercise-modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .exercise-section {
+            padding: 30px;
+        }
+
+        .exercise-intro-content {
+            text-align: center;
+        }
+
+        .exercise-icon {
+            font-size: 48px;
+            color: #6900cc;
+            margin-bottom: 20px;
+        }
+
+        .exercise-intro-content h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .exercise-intro-content p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .exercise-instructions {
+            background: #f8f9fa;
+            border-left: 4px solid #6900cc;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: left;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .exercise-instructions h4 {
+            color: #6900cc;
+            margin-bottom: 15px;
+        }
+
+        .exercise-instructions ul {
+            color: #666;
+            line-height: 1.8;
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .exercise-instructions li {
+            margin-bottom: 8px;
+        }
+
+        .exercise-question {
+            margin-bottom: 30px;
+        }
+
+        .exercise-question h4 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .exercise-question p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .exercise-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .exercise-option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .exercise-option:hover {
+            background: #6900cc;
+            color: white;
+            border-color: #6900cc;
+            transform: translateY(-2px);
+        }
+
+        .exercise-results-content {
+            text-align: center;
+        }
+
+        .score-display {
+            margin: 30px 0;
+        }
+
+        .score-number {
+            font-size: 48px;
+            color: #6900cc;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .score-display p {
+            font-size: 1.2rem;
+            color: #666;
+            margin: 0;
+        }
+
+        .question-review {
+            text-align: left;
+            margin: 30px 0;
+        }
+
+        .question-review h4 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .question-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #e9ecef;
+        }
+
+        .question-item.correct {
+            border-left-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .question-item.incorrect {
+            border-left-color: #dc3545;
+            background: #fff8f8;
+        }
+
+        .question-item h5 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .user-answer {
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .correct-answer {
+            color: #28a745;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .explanation {
+            color: #666;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .status-icon {
+            float: right;
+            font-size: 1.2rem;
+            margin-top: 5px;
+        }
+
+        .question-item.correct .status-icon {
+            color: #28a745;
+        }
+
+        .question-item.incorrect .status-icon {
+            color: #dc3545;
+        }
+
+        /* Exercise-specific button styles - only for exercise modal */
+        .exercise-modal .btn {
+            background: #6900cc;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .exercise-modal .btn:hover {
+            background: #5a00b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(105, 0, 204, 0.3);
+        }
+
+        .exercise-modal .btn-primary {
+            background: #6900cc;
+        }
+
+        .exercise-modal .btn-primary:hover {
+            background: #5a00b3;
+        }
+
+        /* Force red color for the social engineering exercise icon */
+        .lesson-info.exercise-lesson .fas.fa-puzzle-piece {
+            color: #e74c3c !important;
+        }
+    </style>
+</body>
+</html> 

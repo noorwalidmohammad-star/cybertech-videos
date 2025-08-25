@@ -1,0 +1,2284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Management | CyberTech Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4e54c8;
+            --secondary-color: #8f94fb;
+            --success-color: #48bb78;
+            --danger-color: #f56565;
+            --warning-color: #ed8936;
+            --info-color: #4299e1;
+            --bg-color: #f8f9fa;
+            --white: #ffffff;
+            --text-dark: #2d3748;
+            --text-light: #4a5568;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h2 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            color: var(--text-light);
+        }
+
+        .stat-primary i { color: var(--primary-color); }
+        .stat-primary h3 { color: var(--primary-color); }
+        .stat-success i { color: var(--success-color); }
+        .stat-success h3 { color: var(--success-color); }
+        .stat-warning i { color: var(--warning-color); }
+        .stat-warning h3 { color: var(--warning-color); }
+        .stat-danger i { color: var(--danger-color); }
+        .stat-danger h3 { color: var(--danger-color); }
+
+        /* Video Navigation */
+        .video-nav {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .video-nav-item {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-light);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .video-nav-item.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .video-nav-item:hover {
+            color: var(--primary-color);
+        }
+
+        /* Video Content */
+        .video-content {
+            display: none;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .video-content.active {
+            display: block;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .upload-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .upload-header h3 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 10px;
+            padding: 60px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(78, 84, 200, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary-color);
+            background-color: rgba(78, 84, 200, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .upload-input {
+            display: none;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(78, 84, 200, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #3d43a8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--text-light);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #2d3748;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #38a169;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #e53e3e;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #dd6b20;
+        }
+
+        /* Video Grid */
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .video-card {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .video-thumbnail {
+            position: relative;
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .video-info {
+            padding: 20px;
+        }
+
+        .video-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .video-course {
+            background: var(--primary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .video-module {
+            background: var(--success-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .video-lesson {
+            background: var(--info-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .video-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .video-actions .btn {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .close {
+            color: var(--text-light);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: var(--text-dark);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        /* Success Message */
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Video thumbnail play button */
+        .video-thumbnail {
+            position: relative;
+        }
+        
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .video-thumbnail:hover .play-button {
+            opacity: 1;
+        }
+        
+        .play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            color: white;
+        }
+        
+        .video-thumbnail:hover .play-overlay {
+            opacity: 1;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .video-nav {
+                flex-direction: column;
+                border-bottom: none;
+            }
+
+            .video-nav-item {
+                border-bottom: 1px solid var(--border-color);
+                border-radius: 0;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <h1>
+                    <i class="fas fa-video"></i>
+                    Video Management
+                </h1>
+            </div>
+            <div class="header-right">
+                <a href="admin-dashboard.html" class="nav-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h2>Video Management</h2>
+            <p>Upload, organize, and manage course videos - Videos stored in organized folders!</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card stat-primary">
+                <i class="fas fa-video"></i>
+                <h3 id="total-videos">0</h3>
+                <p>Total Videos</p>
+            </div>
+            <div class="stat-card stat-success">
+                <i class="fas fa-eye"></i>
+                <h3 id="total-views">0</h3>
+                <p>Total Views</p>
+            </div>
+            <div class="stat-card stat-warning">
+                <i class="fas fa-clock"></i>
+                <h3 id="total-duration">0 min</h3>
+                <p>Total Duration</p>
+            </div>
+            <div class="stat-card stat-danger">
+                <i class="fas fa-hdd"></i>
+                <h3 id="storage-used">0 MB</h3>
+                <p>Storage Used</p>
+            </div>
+        </div>
+
+        <!-- Video Navigation -->
+        <div class="video-nav">
+            <button class="video-nav-item active" onclick="showVideoTab('library')">
+                <i class="fas fa-film"></i>
+                Video Library
+            </button>
+            <button class="video-nav-item" onclick="showVideoTab('upload')">
+                <i class="fas fa-upload"></i>
+                Upload Video
+            </button>
+        </div>
+
+        <!-- Upload Video Section -->
+        <div id="upload-video" class="video-content">
+            <div class="success-message" id="upload-success">
+                <i class="fas fa-check-circle"></i>
+                Video uploaded successfully!
+            </div>
+
+            <div class="upload-section">
+                <div class="upload-header">
+                    <h3>Upload New Video</h3>
+                    <p>Upload videos with persistent storage!</p>
+                </div>
+
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="upload-text">Drag & drop your video file here</div>
+                    <div class="upload-subtext">or click to browse files</div>
+                    <input type="file" id="video-file" class="upload-input" accept="video/*">
+                </div>
+
+                <div class="progress-bar" id="upload-progress" style="display: none;">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+
+                <form id="video-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="video-title">Video Title</label>
+                            <input type="text" id="video-title" class="form-control" placeholder="Enter video title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="video-duration">Duration (minutes)</label>
+                            <input type="number" id="video-duration" class="form-control" placeholder="e.g., 15" min="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="video-course">Course 
+                                <button type="button" onclick="refreshDropdowns()" style="background: none; border: none; color: var(--primary-color); margin-left: 10px; cursor: pointer;" title="Refresh course data">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </label>
+                            <select id="video-course" class="form-control" required>
+                                <option value="">Select a course</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="video-module">Module</label>
+                            <select id="video-module" class="form-control" required>
+                                <option value="">Select a module</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="video-lesson">Lesson</label>
+                            <select id="video-lesson" class="form-control" required>
+                                <option value="">Select a lesson first</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="video-description">Description</label>
+                        <textarea id="video-description" class="form-control" rows="4" placeholder="Enter video description"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="video-order">Order in Module</label>
+                            <input type="number" id="video-order" class="form-control" placeholder="e.g., 1" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="video-difficulty">Difficulty Level</label>
+                            <select id="video-difficulty" class="form-control">
+                                <option value="beginner">Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload"></i>
+                            Upload Video
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="clearForm()">
+                            <i class="fas fa-times"></i>
+                            Clear Form
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Video Library Section -->
+        <div id="library-video" class="video-content active">
+            <div class="video-library-header">
+                <h3>Video Library</h3>
+                <div class="library-controls">
+                    <select id="filter-course" class="form-control" style="width: 200px; display: inline-block;">
+                        <option value="">All Courses</option>
+                    </select>
+                    <select id="filter-module" class="form-control" style="width: 200px; display: inline-block; margin-left: 10px;">
+                        <option value="">All Modules</option>
+                    </select>
+                    <input type="text" id="search-videos" class="form-control" placeholder="Search videos..." style="width: 250px; display: inline-block; margin-left: 10px;">
+                </div>
+            </div>
+
+            <div class="video-grid" id="video-grid">
+                <!-- Videos will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Video Modal -->
+    <div id="edit-video-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div class="modal-content" style="position: relative; background: #fff; margin: 10% auto; padding: 0; width: 80%; max-width: 700px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <div class="modal-header" style="background: #f8f9fa; padding: 15px 20px; border-bottom: 1px solid #dee2e6; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; color: #333;">Edit Video</h3>
+                <span class="close" onclick="closeEditModal()" style="font-size: 24px; cursor: pointer; color: #666;">&times;</span>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <form id="edit-video-form" style="max-height: 70vh; overflow-y: auto;">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="edit-video-title" style="display: block; margin-bottom: 5px; color: #333;">Video Title</label>
+                        <input type="text" id="edit-video-title" class="form-control" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    </div>
+                    <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="edit-video-duration" style="display: block; margin-bottom: 5px; color: #333;">Duration (minutes)</label>
+                            <input type="number" id="edit-video-duration" class="form-control" min="1" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="edit-video-order" style="display: block; margin-bottom: 5px; color: #333;">Order in Module</label>
+                            <input type="number" id="edit-video-order" class="form-control" min="1" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                    </div>
+                    <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="edit-video-course" style="display: block; margin-bottom: 5px; color: #333;">Course</label>
+                            <select id="edit-video-course" class="form-control" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                <option value="">Select a course</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="edit-video-module" style="display: block; margin-bottom: 5px; color: #333;">Module</label>
+                            <select id="edit-video-module" class="form-control" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                <option value="">Select a module</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="edit-video-lesson" style="display: block; margin-bottom: 5px; color: #333;">Lesson</label>
+                            <select id="edit-video-lesson" class="form-control" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                <option value="">Select a lesson first</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="edit-video-description" style="display: block; margin-bottom: 5px; color: #333;">Description</label>
+                        <textarea id="edit-video-description" class="form-control" rows="4" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; color: #333;">Change Video File (Optional)</label>
+                        <div style="border: 2px dashed #ddd; border-radius: 4px; padding: 20px; text-align: center; background: #f8f9fa; cursor: pointer;" id="edit-upload-area">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 24px; color: #666; margin-bottom: 10px;"></i>
+                            <p style="margin: 0; color: #666;">Drag & drop a new video file here or click to browse</p>
+                            <p style="margin: 5px 0 0; font-size: 12px; color: #999;">Supported formats: MP4, WebM, MOV</p>
+                            <input type="file" id="edit-video-file" accept="video/*" style="display: none;">
+                        </div>
+                        <div id="edit-upload-preview" style="display: none; margin-top: 10px;">
+                            <div style="display: flex; align-items: center; padding: 10px; background: #e9ecef; border-radius: 4px;">
+                                <i class="fas fa-video" style="margin-right: 10px; color: #666;"></i>
+                                <div style="flex-grow: 1;">
+                                    <div id="edit-file-name" style="font-weight: bold;"></div>
+                                    <div id="edit-file-size" style="font-size: 12px; color: #666;"></div>
+                                </div>
+                                <button type="button" id="edit-remove-file" style="background: none; border: none; color: #dc3545; cursor: pointer;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 20px; text-align: right; padding: 15px; border-top: 1px solid #eee;">
+                        <button type="submit" class="btn btn-primary" style="margin-right: 10px; display: inline-block; padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                            <i class="fas fa-save" style="margin-right: 5px;"></i>
+                            Save Changes
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeEditModal()" style="display: inline-block; padding: 8px 16px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                            <i class="fas fa-times" style="margin-right: 5px;"></i>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div id="video-player-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column;">
+        <div style="position: relative; width: 80%; max-width: 900px; background: #000; border-radius: 8px; overflow: hidden;">
+            <div style="background: #333; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="video-player-title" style="margin: 0; color: white; font-size: 18px;">Video Title</h3>
+                <button onclick="closeVideoPlayer()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            
+            <div id="video-player-container" style="background: #000; width: 100%;">
+                <video id="video-player" controls controlsList="nodownload" playsinline preload="auto" style="width: 100%; max-height: 70vh;">
+                    <!-- Video content will be loaded dynamically -->
+                </video>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px;">
+                <p id="video-player-course" style="margin: 0; color: #666;">Course > Module > Lesson</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let videos = [];
+        let courses = [];
+        let currentEditingVideo = null;
+        let videoCounter = 0;
+        let currentVideoFile = null;
+
+        // IndexedDB for persistent video storage
+        const DB_NAME = 'CyberTechVideoDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'videos';
+        let db = null;
+
+        // Initialize IndexedDB
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+                request.onerror = () => {
+                    console.error('Failed to open IndexedDB');
+                    reject(request.error);
+                };
+
+                request.onsuccess = () => {
+                    db = request.result;
+                    console.log('✅ IndexedDB initialized successfully');
+                    resolve(db);
+                };
+
+                request.onupgradeneeded = (event) => {
+                   db = event.target.result;
+                   
+                   // Create object store if it doesn't exist
+                   if (!db.objectStoreNames.contains(STORE_NAME)) {
+                       const objectStore = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                       objectStore.createIndex('uploadedByAdmin', 'uploadedByAdmin', { unique: false });
+                       console.log('✅ Object store created');
+                   }
+               };
+           });
+       }
+
+       // Save video to IndexedDB
+       function saveVideoToDB(videoData) {
+           return new Promise((resolve, reject) => {
+               const transaction = db.transaction([STORE_NAME], 'readwrite');
+               const store = transaction.objectStore(STORE_NAME);
+               const request = store.put(videoData);
+
+               request.onsuccess = () => {
+                   console.log('✅ Video saved to IndexedDB');
+                   resolve();
+               };
+
+               request.onerror = () => {
+                   console.error('Failed to save video to IndexedDB');
+                   reject(request.error);
+               };
+           });
+       }
+
+       // Get all videos from IndexedDB
+       function getAllVideosFromDB() {
+           return new Promise((resolve, reject) => {
+               const transaction = db.transaction([STORE_NAME], 'readonly');
+               const store = transaction.objectStore(STORE_NAME);
+               const index = store.index('uploadedByAdmin');
+               const request = index.getAll(true);
+
+               request.onsuccess = () => {
+                   resolve(request.result || []);
+               };
+
+               request.onerror = () => {
+                   console.error('Failed to get videos from IndexedDB');
+                   reject(request.error);
+               };
+           });
+       }
+
+       // Get single video from IndexedDB
+       function getVideoFromDB(videoId) {
+           return new Promise((resolve, reject) => {
+               const transaction = db.transaction([STORE_NAME], 'readonly');
+               const store = transaction.objectStore(STORE_NAME);
+               const request = store.get(videoId);
+
+               request.onsuccess = () => {
+                   resolve(request.result);
+               };
+
+               request.onerror = () => {
+                   reject(request.error);
+               };
+           });
+       }
+
+       // Delete video from IndexedDB
+       function deleteVideoFromDB(videoId) {
+           return new Promise((resolve, reject) => {
+               const transaction = db.transaction([STORE_NAME], 'readwrite');
+               const store = transaction.objectStore(STORE_NAME);
+               const request = store.delete(videoId);
+
+               request.onsuccess = () => {
+                   console.log('✅ Video deleted from IndexedDB');
+                   resolve();
+               };
+
+               request.onerror = () => {
+                   reject(request.error);
+               };
+           });
+       }
+
+       // Initialize on page load
+       document.addEventListener('DOMContentLoaded', function() {
+           console.log('Initializing video management system...');
+           
+           // Load admin videos from localStorage
+           loadAdminVideos();
+           
+           loadCourses();
+           setupEventListeners();
+           updateStats();
+           renderVideoLibrary();
+           
+           showUploadNotification('✅ Video management system ready!');
+       });
+
+       // Load admin videos from localStorage and file system
+       function loadAdminVideos() {
+           console.log('Loading admin videos...');
+           
+           try {
+               // First try to load from localStorage
+               const savedVideos = localStorage.getItem('cybertech_admin_videos');
+               if (savedVideos) {
+                   videos = JSON.parse(savedVideos).filter(v => v.uploadedByAdmin === true);
+                   console.log(`✅ Loaded ${videos.length} admin videos from localStorage`);
+               } else {
+                   videos = [];
+               }
+               
+               // If no videos in localStorage, create metadata for videos in folder
+               if (videos.length === 0) {
+                   // Create metadata for "Phishing 1.mp4"
+                   const videoId = 'video_' + Date.now();
+                   const phishingVideo = {
+                       id: videoId,
+                       uniqueId: videoId,
+                       title: 'Phishing 1',
+                       courseName: 'Phishing Awareness',
+                       moduleName: 'Introduction to Phishing',
+                       lessonName: 'What is Phishing?',
+                       duration: 5, // 5 minutes duration
+                       views: 0,
+                       plays: 0,
+                       fileSize: 13.42, // 13.42 MB
+                       fileName: 'Phishing 1.mp4',
+                       fileType: 'video/mp4',
+                       thumbnail: null,
+                       status: 'active',
+                       uploadedByAdmin: true,
+                       createdAt: Date.now(),
+                       lastSaved: Date.now(),
+                       filePath: 'videos/courses/Phishing 1.mp4',
+                       thumbnailPath: `videos/thumbnails/${videoId}_thumb.jpg`
+                   };
+                   
+                   videos.push(phishingVideo);
+                   console.log('✅ Created metadata for video in folder:', phishingVideo.title);
+                   
+                   // Save the metadata
+                   saveAdminVideos();
+               }
+               
+               // Update counter
+               videoCounter = Date.now();
+               
+           } catch (e) {
+               console.error('Error loading admin videos:', e);
+               videos = [];
+               videoCounter = Date.now();
+           }
+       }
+
+       // Save admin videos to localStorage
+       function saveAdminVideos() {
+           try {
+               // Save metadata to localStorage for quick access
+               const videoMetadata = videos.map(video => ({
+                   ...video,
+                   uploadedByAdmin: true,
+                   // Don't save video data in localStorage
+                   videoData: undefined,
+                   base64Data: undefined
+               }));
+               
+               localStorage.setItem('cybertech_admin_videos', JSON.stringify(videoMetadata));
+               console.log(`✅ Saved ${videos.length} admin video metadata to localStorage`);
+           } catch (e) {
+               console.error('Error saving admin videos:', e);
+               showUploadNotification('⚠️ Error saving video metadata', 'warning');
+           }
+       }
+
+       // Load courses from localStorage
+       function loadCourses() {
+           const savedCourses = localStorage.getItem('cybertech_admin_courses');
+           if (savedCourses) {
+               try {
+                   courses = JSON.parse(savedCourses);
+                   console.log(`Loaded ${courses.length} courses`);
+               } catch (e) {
+                   console.error('Error parsing saved courses:', e);
+                   createDefaultCourses();
+               }
+           } else {
+               createDefaultCourses();
+           }
+           populateCourseDropdowns();
+       }
+
+       function createDefaultCourses() {
+           courses = [
+               {
+                   id: 1,
+                   name: "Phishing Awareness",
+                   difficulty: "beginner",
+                   modules: [
+                       { 
+                           id: 1, 
+                           title: "Introduction to Phishing", 
+                           duration: "25 min",
+                           lessons: [
+                               { id: 1, title: "What is Phishing?", duration: "8 min" },
+                               { id: 2, title: "The History and Evolution of Phishing Attacks", duration: "10 min" },
+                               { id: 3, title: "Common Types of Phishing Attacks", duration: "7 min" }
+                           ]
+                       },
+                       { 
+                           id: 2, 
+                           title: "Identifying Phishing Attempts", 
+                           duration: "35 min",
+                           lessons: [
+                               { id: 1, title: "Red Flags in Email Messages", duration: "12 min" },
+                               { id: 2, title: "Analyzing URLs and Website Security", duration: "10 min" },
+                               { id: 3, title: "Interactive Exercise: Spot the Phish", duration: "13 min" }
+                           ]
+                       }
+                   ]
+               },
+               {
+                   id: 2,
+                   name: "Password Security",
+                   difficulty: "beginner",
+                   modules: [
+                       { 
+                           id: 1, 
+                           title: "Password Fundamentals", 
+                           duration: "20 min",
+                           lessons: [
+                               { id: 1, title: "The Importance of Password Security", duration: "7 min" },
+                               { id: 2, title: "How Passwords Get Compromised", duration: "8 min" },
+                               { id: 3, title: "Common Password Mistakes", duration: "5 min" }
+                           ]
+                       },
+                       { 
+                           id: 2, 
+                           title: "Creating Strong Passwords", 
+                           duration: "25 min",
+                           lessons: [
+                               { id: 1, title: "Characteristics of Strong Passwords", duration: "8 min" },
+                               { id: 2, title: "Passphrases vs. Traditional Passwords", duration: "7 min" },
+                               { id: 3, title: "Interactive Exercise: Password Strength Analyzer", duration: "10 min" }
+                           ]
+                       }
+                   ]
+               },
+               {
+                   id: 3,
+                   name: "Social Engineering Defense",
+                   difficulty: "intermediate",
+                   modules: [
+                       { 
+                           id: 1, 
+                           title: "Understanding Social Engineering", 
+                           duration: "25 min",
+                           lessons: [
+                               { id: 1, title: "What is Social Engineering?", duration: "8 min" },
+                               { id: 2, title: "The Psychology of Manipulation", duration: "10 min" },
+                               { id: 3, title: "Real-world Social Engineering Examples", duration: "7 min" }
+                           ]
+                       },
+                       { 
+                           id: 2, 
+                           title: "Defense Strategies", 
+                           duration: "20 min",
+                           lessons: [
+                               { id: 1, title: "Employee Training Best Practices", duration: "7 min" },
+                               { id: 2, title: "Verification Procedures", duration: "8 min" },
+                               { id: 3, title: "Creating a Security-Aware Culture", duration: "5 min" }
+                           ]
+                       }
+                   ]
+               },
+               {
+                   id: 4,
+                   name: "Data Protection Essentials",
+                   difficulty: "intermediate",
+                   modules: [
+                       { 
+                           id: 1, 
+                           title: "Technical Safeguards", 
+                           duration: "30 min",
+                           lessons: [
+                               { id: 1, title: "Encryption Standards", duration: "12 min" },
+                               { id: 2, title: "Access Control Best Practices", duration: "15 min" },
+                               { id: 3, title: "Data Backup and Recovery", duration: "3 min" }
+                           ]
+                       },
+                       { 
+                           id: 2, 
+                           title: "Regulatory Compliance", 
+                           duration: "25 min",
+                           lessons: [
+                               { id: 1, title: "GDPR Overview", duration: "15 min" },
+                               { id: 2, title: "Data Classification", duration: "10 min" }
+                           ]
+                       }
+                   ]
+               }
+           ];
+           
+           localStorage.setItem('cybertech_admin_courses', JSON.stringify(courses));
+           setTimeout(() => {
+               populateCourseDropdowns();
+           }, 50);
+       }
+
+       // Populate course dropdowns
+       function populateCourseDropdowns() {
+           const courseSelects = ['video-course', 'edit-video-course', 'filter-course'];
+           courseSelects.forEach(selectId => {
+               const select = document.getElementById(selectId);
+               if (select) {
+                   select.innerHTML = selectId.includes('filter') ? '<option value="">All Courses</option>' : '<option value="">Select a course</option>';
+                   courses.forEach(course => {
+                       const option = document.createElement('option');
+                       option.value = course.id;
+                       option.textContent = course.name;
+                       select.appendChild(option);
+                   });
+               }
+           });
+       }
+
+       // Update module dropdown based on selected course
+       function updateModuleDropdown(courseSelectId, moduleSelectId) {
+           const courseSelect = document.getElementById(courseSelectId);
+           const moduleSelect = document.getElementById(moduleSelectId);
+           const selectedCourseId = parseInt(courseSelect.value);
+           
+           moduleSelect.innerHTML = moduleSelectId.includes('filter') ? '<option value="">All Modules</option>' : '<option value="">Select a module</option>';
+           
+           if (selectedCourseId) {
+               const selectedCourse = courses.find(course => course.id === selectedCourseId);
+               if (selectedCourse && selectedCourse.modules) {
+                   selectedCourse.modules.forEach(module => {
+                       const option = document.createElement('option');
+                       option.value = module.id;
+                       option.textContent = module.title;
+                       moduleSelect.appendChild(option);
+                   });
+               }
+           }
+           
+           const lessonSelectId = moduleSelectId.replace('module', 'lesson');
+           const lessonSelect = document.getElementById(lessonSelectId);
+           if (lessonSelect) {
+               lessonSelect.innerHTML = '<option value="">Select a module first</option>';
+           }
+       }
+
+       // Update lesson dropdown based on selected module
+       function updateLessonDropdown(courseSelectId, moduleSelectId, lessonSelectId) {
+           const courseSelect = document.getElementById(courseSelectId);
+           const moduleSelect = document.getElementById(moduleSelectId);
+           const lessonSelect = document.getElementById(lessonSelectId);
+           
+           const selectedCourseId = parseInt(courseSelect.value);
+           const selectedModuleId = parseInt(moduleSelect.value);
+           
+           lessonSelect.innerHTML = '<option value="">Select a lesson</option>';
+           
+           const selectedCourse = courses.find(course => course.id === selectedCourseId);
+           if (!selectedCourse) return;
+           
+           const selectedModule = selectedCourse.modules.find(module => module.id === selectedModuleId);
+           if (!selectedModule || !selectedModule.lessons) {
+               lessonSelect.innerHTML = '<option value="">No lessons available</option>';
+               return;
+           }
+           
+           selectedModule.lessons.forEach(lesson => {
+               const option = document.createElement('option');
+               option.value = lesson.id;
+               option.textContent = lesson.title + ' (' + lesson.duration + ')';
+               lessonSelect.appendChild(option);
+           });
+       }
+
+       // Setup event listeners
+       function setupEventListeners() {
+           // Main upload area
+           const uploadArea = document.getElementById('upload-area');
+           const fileInput = document.getElementById('video-file');
+
+           uploadArea.addEventListener('click', () => fileInput.click());
+           uploadArea.addEventListener('dragover', handleDragOver);
+           uploadArea.addEventListener('drop', handleDrop);
+           uploadArea.addEventListener('dragleave', handleDragLeave);
+
+           // Edit form upload area
+           const editUploadArea = document.getElementById('edit-upload-area');
+           const editFileInput = document.getElementById('edit-video-file');
+           let currentEditFile = null;
+
+           if (editUploadArea && editFileInput) {
+               editUploadArea.addEventListener('click', () => editFileInput.click());
+               editUploadArea.addEventListener('dragover', (e) => {
+                   e.preventDefault();
+                   editUploadArea.style.borderColor = '#007bff';
+                   editUploadArea.style.backgroundColor = '#f1f8ff';
+               });
+               editUploadArea.addEventListener('dragleave', (e) => {
+                   editUploadArea.style.borderColor = '#ddd';
+                   editUploadArea.style.backgroundColor = '#f8f9fa';
+               });
+               editUploadArea.addEventListener('drop', (e) => {
+                   e.preventDefault();
+                   editUploadArea.style.borderColor = '#ddd';
+                   editUploadArea.style.backgroundColor = '#f8f9fa';
+                   const files = e.dataTransfer.files;
+                   if (files.length > 0) {
+                       handleEditFileSelect(files[0]);
+                   }
+               });
+
+               editFileInput.addEventListener('change', (e) => {
+                   if (e.target.files.length > 0) {
+                       handleEditFileSelect(e.target.files[0]);
+                   }
+               });
+
+               // Remove file button
+               document.getElementById('edit-remove-file').addEventListener('click', () => {
+                   currentEditFile = null;
+                   document.getElementById('edit-upload-preview').style.display = 'none';
+                   editFileInput.value = '';
+               });
+           }
+
+           fileInput.addEventListener('change', handleFileSelect);
+
+           document.getElementById('video-course').addEventListener('change', () => {
+               updateModuleDropdown('video-course', 'video-module');
+           });
+
+           document.getElementById('edit-video-course').addEventListener('change', () => {
+               updateModuleDropdown('edit-video-course', 'edit-video-module');
+           });
+
+           document.getElementById('filter-course').addEventListener('change', () => {
+               updateModuleDropdown('filter-course', 'filter-module');
+               filterVideos();
+           });
+
+           document.getElementById('video-module').addEventListener('change', function() {
+               updateLessonDropdown('video-course', 'video-module', 'video-lesson');
+           });
+
+           document.getElementById('edit-video-module').addEventListener('change', function() {
+               updateLessonDropdown('edit-video-course', 'edit-video-module', 'edit-video-lesson');
+           });
+
+           document.getElementById('filter-module').addEventListener('change', filterVideos);
+           document.getElementById('search-videos').addEventListener('input', filterVideos);
+
+           document.getElementById('video-form').addEventListener('submit', handleVideoUpload);
+           document.getElementById('edit-video-form').addEventListener('submit', handleVideoEdit);
+           
+           // Add event listeners for video cards (using event delegation)
+           const videoGrid = document.getElementById('video-grid');
+           if (videoGrid) {
+               // Play video when thumbnail is clicked
+               videoGrid.addEventListener('click', function(e) {
+                   console.log('Video grid clicked:', e.target);
+                   const thumbnail = e.target.closest('.video-thumbnail');
+                   if (thumbnail) {
+                       const videoId = thumbnail.dataset.videoId;
+                       console.log('Thumbnail clicked, video ID:', videoId);
+                       if (videoId) {
+                           playVideo(videoId);
+                       }
+                   }
+               });
+               
+               // Edit video when edit button is clicked
+               videoGrid.addEventListener('click', function(e) {
+                   const editBtn = e.target.closest('.edit-video-btn');
+                   if (editBtn) {
+                       const videoId = editBtn.dataset.videoId;
+                       console.log('Edit button clicked, video ID:', videoId);
+                       if (videoId) {
+                           editVideo(videoId);
+                       }
+                   }
+               });
+               
+               // Delete video when delete button is clicked
+               videoGrid.addEventListener('click', function(e) {
+                   const deleteBtn = e.target.closest('.delete-video-btn');
+                   if (deleteBtn) {
+                       const videoId = deleteBtn.dataset.videoId;
+                       console.log('Delete button clicked, video ID:', videoId);
+                       if (videoId) {
+                           deleteVideo(videoId);
+                       }
+                   }
+               });
+           }
+       }
+
+       // Drag and drop handlers
+       function handleDragOver(e) {
+           e.preventDefault();
+           e.currentTarget.classList.add('dragover');
+       }
+
+       function handleDragLeave(e) {
+           e.currentTarget.classList.remove('dragover');
+       }
+
+       function handleDrop(e) {
+           e.preventDefault();
+           e.currentTarget.classList.remove('dragover');
+           const files = e.dataTransfer.files;
+           handleFiles(files);
+       }
+
+       function handleFileSelect(e) {
+           const files = e.target.files;
+           handleFiles(files);
+       }
+
+       // Handle file upload
+       async function handleFiles(files) {
+           if (files.length > 0) {
+               const file = files[0];
+               if (file.type.startsWith('video/')) {
+                   console.log(`Processing video: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+                   
+                   showUploadProgress();
+                   
+                   // Auto-fill title
+                   document.getElementById('video-title').value = file.name.replace(/\.[^/.]+$/, "");
+                   
+                   currentVideoFile = file;
+                   simulateUploadProgress(file);
+               } else {
+                   showUploadNotification('❌ Please select a valid video file.', 'error');
+               }
+           }
+       }
+
+       function showUploadProgress() {
+           document.getElementById('upload-progress').style.display = 'block';
+       }
+
+       function simulateUploadProgress(file) {
+           const progressFill = document.getElementById('progress-fill');
+           let progress = 0;
+           const interval = setInterval(() => {
+               progress += Math.random() * 10;
+               if (progress >= 100) {
+                   progress = 100;
+                   clearInterval(interval);
+                   
+                   setTimeout(() => {
+                       document.getElementById('upload-progress').style.display = 'none';
+                       progressFill.style.width = '0%';
+                       showUploadNotification('✅ Video ready! Complete the form to save.');
+                   }, 1000);
+               }
+               progressFill.style.width = progress + '%';
+           }, 200);
+       }
+
+       function showUploadNotification(message, type = 'success') {
+           const notification = document.createElement('div');
+           const colors = {
+               success: '#4CAF50',
+               error: '#f44336',
+               warning: '#ff9800',
+               info: '#2196F3'
+           };
+           
+           notification.style.cssText = `
+               position: fixed;
+               top: 20px;
+               right: 20px;
+               background: ${colors[type] || colors.success};
+               color: white;
+               padding: 15px 20px;
+               border-radius: 5px;
+               z-index: 10000;
+               box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+               max-width: 400px;
+               word-wrap: break-word;
+           `;
+           notification.textContent = message;
+           document.body.appendChild(notification);
+           
+           setTimeout(() => {
+               notification.remove();
+           }, 5000);
+       }
+
+       // Enhanced video upload with persistent storage
+       function handleVideoUpload(e) {
+           e.preventDefault();
+           
+           if (!currentVideoFile) {
+               showUploadNotification('❌ Please select a video file first.', 'error');
+               return;
+           }
+           
+           const courseId = document.getElementById('video-course').value;
+           const moduleId = document.getElementById('video-module').value;
+           const lessonId = document.getElementById('video-lesson').value;
+           const title = document.getElementById('video-title').value.trim();
+           
+           if (!courseId || !moduleId || !lessonId || !title) {
+               showUploadNotification('❌ Please fill in all required fields.', 'error');
+               return;
+           }
+
+           const selectedCourse = courses.find(c => c.id === parseInt(courseId));
+           const selectedModule = selectedCourse ? selectedCourse.modules.find(m => m.id === parseInt(moduleId)) : null;
+           const selectedLesson = selectedModule ? selectedModule.lessons.find(l => l.id === parseInt(lessonId)) : null;
+
+           const videoData = {
+               title: title,
+               duration: parseInt(document.getElementById('video-duration').value) || 0,
+               courseId: parseInt(courseId),
+               courseName: selectedCourse?.name || '',
+               moduleId: parseInt(moduleId),
+               moduleName: selectedModule?.title || '',
+               lessonId: parseInt(lessonId),
+               lessonName: selectedLesson?.title || '',
+               description: document.getElementById('video-description').value || '',
+               order: parseInt(document.getElementById('video-order').value) || 1,
+               difficulty: document.getElementById('video-difficulty').value || 'beginner'
+           };
+           
+           completeVideoUpload(videoData, currentVideoFile);
+       }
+
+       // Complete video upload with folder storage
+       function completeVideoUpload(videoData, file) {
+           const timestamp = Date.now();
+           const videoId = `video_${timestamp}`;
+           
+           showUploadNotification('📤 Processing video... Please wait.', 'info');
+           
+           // Convert file to base64 for storage
+           fileToBase64(file).then(base64Data => {
+               
+               const uploadTimestamp = new Date().toISOString();
+               
+               // Create complete video object with folder paths
+               const completeVideo = {
+                   id: videoId,
+                   uniqueId: videoId,
+                   ...videoData,
+                   views: 0,
+                   plays: 0,
+                   completionRate: 0,
+                   uploadDate: uploadTimestamp,
+                   fileSize: Math.round(file.size / (1024 * 1024) * 100) / 100,
+                   fileName: file.name,
+                   fileType: file.type,
+                   thumbnail: null,
+                   status: 'active',
+                   uploadedByAdmin: true,
+                   createdAt: timestamp,
+                   lastSaved: timestamp,
+                   // Store file paths for persistent access
+                   filePath: `videos/courses/${file.name}`,
+                   thumbnailPath: `videos/thumbnails/${videoId}_thumb.jpg`,
+                   videoData: base64Data // Store the actual video data
+               };
+
+                               // Save video data to localStorage (as backup)
+                try {
+                    // Save the video data directly with the video ID
+                    localStorage.setItem(`video_data_${videoId}`, base64Data);
+                    console.log('✅ Video data saved to localStorage with ID:', videoId);
+
+                    // Also save it with a more specific key that includes the lesson name
+                    localStorage.setItem(`video_data_${videoId}_${videoData.lessonName.replace(/\s+/g, '_')}`, base64Data);
+                    console.log('✅ Video data saved with lesson name');
+                } catch (e) {
+                    console.warn('Could not save video data to localStorage (size limit):', e);
+                }
+
+                // Add to videos array (without video data for memory efficiency)
+                const videoMetadata = { ...completeVideo };
+                delete videoMetadata.videoData; // Remove large data from memory
+                videos.push(videoMetadata);
+                
+                // Save metadata
+                saveAdminVideos();
+                
+                // Save for users with the video data included
+                saveVideoForUsers(videoMetadata, videoId, base64Data);
+               
+               // Clean up
+               currentVideoFile = null;
+               
+               // Show success
+               showSuccessMessage('upload-success');
+               showUploadNotification(`✅ Video "${videoMetadata.title}" uploaded successfully!`);
+               
+               // Update UI
+               clearForm();
+               updateStats();
+               renderVideoLibrary();
+               showVideoTab('library');
+               
+           }).catch(error => {
+               console.error('Error during video upload:', error);
+               showUploadNotification('❌ Error uploading video. Please try again.', 'error');
+           });
+       }
+
+       // Convert file to base64
+       function fileToBase64(file) {
+           return new Promise((resolve, reject) => {
+               const reader = new FileReader();
+               reader.onload = () => resolve(reader.result);
+               reader.onerror = reject;
+               reader.readAsDataURL(file);
+           });
+       }
+
+       // Save video for users with video data
+       function saveVideoForUsers(videoMetadata, videoId, videoData) {
+           try {
+               let userVideos = JSON.parse(localStorage.getItem('cybertech_user_videos') || '[]');
+               
+               // Create user video object with the video data
+               const userVideo = {
+                   id: videoMetadata.id,
+                   uniqueId: videoMetadata.uniqueId,
+                   title: videoMetadata.title,
+                   description: videoMetadata.description,
+                   duration: videoMetadata.duration,
+                   courseId: videoMetadata.courseId,
+                   courseName: videoMetadata.courseName,
+                   moduleId: videoMetadata.moduleId,
+                   moduleName: videoMetadata.moduleName,
+                   lessonId: videoMetadata.lessonId,
+                   lessonName: videoMetadata.lessonName,
+                   publishedDate: videoMetadata.uploadDate,
+                   difficulty: videoMetadata.difficulty,
+                   order: videoMetadata.order,
+                   status: 'published',
+                   dateAdded: new Date().toISOString(),
+                   uploadedByAdmin: true,
+                   fileType: videoMetadata.fileType,
+                   hasVideoData: true,
+                   videoId: videoId,
+                   videoUrl: videoData, // Use the provided video data directly
+                   isUploadedFile: true, // Flag to indicate this is a real uploaded file
+                   filePath: videoMetadata.filePath // Add the file path
+               };
+               
+               // Remove any existing video with the same ID
+               userVideos = userVideos.filter(v => v.id !== videoId);
+               
+               // Add the new video
+               userVideos.push(userVideo);
+               
+               // Save to localStorage
+               localStorage.setItem('cybertech_user_videos', JSON.stringify(userVideos));
+               console.log('✅ Video saved for users with video data');
+               
+               // Also save the video data separately with multiple keys for redundancy
+               try {
+                   localStorage.setItem(`video_data_${videoId}`, videoData);
+                   localStorage.setItem(`video_data_${videoId}_${videoMetadata.lessonName.replace(/\s+/g, '_')}`, videoData);
+                   localStorage.setItem(`video_data_${videoMetadata.lessonName.replace(/\s+/g, '_')}`, videoData);
+                   console.log('✅ Video data saved with multiple keys for redundancy');
+               } catch (e) {
+                   console.warn('Could not save redundant video data:', e);
+               }
+               
+               // Dispatch event to notify course pages
+               const event = new CustomEvent('newVideoAdded', { 
+                   detail: { 
+                       video: userVideo,
+                       timestamp: Date.now()
+                   }
+               });
+               window.dispatchEvent(event);
+               
+           } catch (e) {
+               console.warn('Could not save video for users:', e);
+           }
+       }
+
+       // Handle edit file selection
+       function handleEditFileSelect(file) {
+           if (file.type.startsWith('video/')) {
+               currentEditFile = file;
+               const preview = document.getElementById('edit-upload-preview');
+               const fileName = document.getElementById('edit-file-name');
+               const fileSize = document.getElementById('edit-file-size');
+               
+               preview.style.display = 'block';
+               fileName.textContent = file.name;
+               fileSize.textContent = `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+           } else {
+               showUploadNotification('❌ Please select a valid video file.', 'error');
+           }
+       }
+
+       // Handle video edit
+       function handleVideoEdit(e) {
+           e.preventDefault();
+           
+           if (currentEditingVideo) {
+               const videoIndex = videos.findIndex(v => v.id === currentEditingVideo.id);
+               if (videoIndex !== -1) {
+                   const selectedCourse = courses.find(c => c.id === parseInt(document.getElementById('edit-video-course').value));
+                   const selectedModule = selectedCourse?.modules.find(m => m.id === parseInt(document.getElementById('edit-video-module').value));
+                   const selectedLesson = selectedModule?.lessons.find(l => l.id === parseInt(document.getElementById('edit-video-lesson').value));
+
+                   const updatedVideo = {
+                       ...videos[videoIndex],
+                       title: document.getElementById('edit-video-title').value,
+                       duration: parseInt(document.getElementById('edit-video-duration').value),
+                       courseId: parseInt(document.getElementById('edit-video-course').value),
+                       courseName: selectedCourse?.name || '',
+                       moduleId: parseInt(document.getElementById('edit-video-module').value),
+                       moduleName: selectedModule?.title || '',
+                       lessonId: parseInt(document.getElementById('edit-video-lesson').value),
+                       lessonName: selectedLesson?.title || '',
+                       description: document.getElementById('edit-video-description').value,
+                       order: parseInt(document.getElementById('edit-video-order').value),
+                       lastModified: Date.now(),
+                       uploadedByAdmin: true
+                   };
+
+                   // If a new file was selected, process it
+                   if (currentEditFile) {
+                       showUploadNotification('⏳ Processing new video file...', 'info');
+                       
+                       // Convert new file to base64
+                       fileToBase64(currentEditFile).then(base64Data => {
+                           // Update video data
+                           localStorage.setItem(`video_data_${updatedVideo.id}`, base64Data);
+                           
+                           // Update metadata
+                           updatedVideo.fileName = currentEditFile.name;
+                           updatedVideo.fileSize = Math.round(currentEditFile.size / (1024 * 1024) * 100) / 100;
+                           updatedVideo.fileType = currentEditFile.type;
+                           updatedVideo.filePath = `videos/courses/${currentEditFile.name}`;
+                           
+                           // Save changes
+                           videos[videoIndex] = updatedVideo;
+                           saveAdminVideos();
+                           
+                           // Clean up
+                           currentEditFile = null;
+                           
+                           // Update UI
+                           closeEditModal();
+                           renderVideoLibrary();
+                           updateStats();
+                           showUploadNotification('✅ Video updated with new file successfully!');
+                       }).catch(error => {
+                           console.error('Error processing new video file:', error);
+                           showUploadNotification('❌ Error processing new video file. Please try again.', 'error');
+                       });
+                   } else {
+                       // Save metadata changes only
+                       videos[videoIndex] = updatedVideo;
+                       saveAdminVideos();
+                       
+                       closeEditModal();
+                       renderVideoLibrary();
+                       updateStats();
+                       showUploadNotification('✅ Video details updated successfully!');
+                   }
+               }
+           }
+       }
+
+       // Clear form
+       function clearForm() {
+           document.getElementById('video-form').reset();
+           document.getElementById('video-module').innerHTML = '<option value="">Select a module</option>';
+           document.getElementById('video-lesson').innerHTML = '<option value="">Select a lesson first</option>';
+           document.getElementById('video-file').value = '';
+           currentVideoFile = null;
+       }
+
+       // Show success message
+       function showSuccessMessage(messageId) {
+           const message = document.getElementById(messageId);
+           if (message) {
+               message.classList.add('show');
+               setTimeout(() => {
+                   message.classList.remove('show');
+               }, 3000);
+           }
+       }
+
+       // Show video tab
+       function showVideoTab(tabName) {
+           document.querySelectorAll('.video-content').forEach(tab => {
+               tab.classList.remove('active');
+           });
+           
+           document.querySelectorAll('.video-nav-item').forEach(item => {
+               item.classList.remove('active');
+           });
+           
+           document.querySelector(`.video-nav-item[onclick="showVideoTab('${tabName}')"]`).classList.add('active');
+           document.getElementById(`${tabName}-video`).classList.add('active');
+           
+           if (tabName === 'library') {
+               renderVideoLibrary();
+           }
+       }
+
+       // Render video library
+       function renderVideoLibrary() {
+           const grid = document.getElementById('video-grid');
+           grid.innerHTML = '';
+           
+           // Always reload admin videos to ensure latest data is shown
+           loadAdminVideos();
+           
+           console.log('Rendering video library. Videos count:', videos.length);
+           console.log('Videos:', videos);
+           
+           if (videos.length === 0) {
+               grid.innerHTML = `
+                   <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #666;">
+                       <i class="fas fa-video" style="font-size: 3rem; margin-bottom: 15px; color: #ddd;"></i>
+                       <h3>No Admin Videos Yet</h3>
+                       <p>Upload your first video - Videos are stored persistently!</p>
+                   </div>
+               `;
+               return;
+           }
+
+           const sortedVideos = [...videos].sort((a, b) => {
+               const dateA = new Date(a.uploadDate || 0);
+               const dateB = new Date(b.uploadDate || 0);
+               return dateB - dateA;
+           });
+
+           sortedVideos.forEach(video => {
+               const videoCard = createVideoCard(video);
+               grid.appendChild(videoCard);
+           });
+       }
+
+       // Create video card
+       function createVideoCard(video) {
+           if (!video || !video.id || !video.title) {
+               console.warn('Invalid video data:', video);
+               return document.createElement('div');
+           }
+           
+           const card = document.createElement('div');
+           card.className = 'video-card';
+           
+           const safeVideo = {
+               id: video.id,
+               title: video.title || 'Untitled Video',
+               courseName: video.courseName || 'No Course',
+               moduleName: video.moduleName || 'No Module',
+               lessonName: video.lessonName || '',
+               duration: video.duration || 0,
+               views: video.views || 0,
+               plays: video.plays || 0,
+               fileSize: video.fileSize || 0
+           };
+           
+           // Admin status badge
+           let statusBadge = '<div style="position: absolute; top: 10px; left: 10px; background: #4CAF50; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; z-index: 2;"><i class="fas fa-shield-alt"></i> Admin</div>';
+           
+           // Optimized badge for persistent storage
+           // Optimized badge for persistent storage
+           let optimizedBadge = '<div style="position: absolute; top: 10px; right: 10px; background: #ff9800; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; z-index: 2;"><i class="fas fa-database"></i> Optimized</div>';
+           
+           card.innerHTML = `
+               <div class="video-thumbnail" data-video-id="${safeVideo.id}" style="cursor: pointer;">
+                   <div style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); 
+                               height: 100%; display: flex; align-items: center; justify-content: center; color: white;">
+                       <i class="fas fa-play" style="font-size: 2rem;"></i>
+                   </div>
+                   <div class="video-duration">${safeVideo.duration} min</div>
+                   <div class="play-button">
+                       <i class="fas fa-play"></i>
+                   </div>
+                   ${statusBadge}
+                   ${optimizedBadge}
+               </div>
+               <div class="video-info">
+                   <div class="video-title">${safeVideo.title}</div>
+                   <div class="video-meta">
+                       <span class="video-course">${safeVideo.courseName}</span>
+                       <span class="video-module">${safeVideo.moduleName}</span>
+                       ${safeVideo.lessonName ? `<span class="video-lesson">${safeVideo.lessonName}</span>` : ''}
+                   </div>
+                   <div class="video-meta">
+                       <span><i class="fas fa-eye"></i> ${safeVideo.views} views</span>
+                       <span><i class="fas fa-play"></i> ${safeVideo.plays} plays</span>
+                       <span><i class="fas fa-hdd"></i> ${safeVideo.fileSize} MB</span>
+                   </div>
+                   <div class="video-actions">
+                       <button class="btn btn-primary edit-video-btn" data-video-id="${safeVideo.id}">
+                           <i class="fas fa-edit"></i>
+                           Edit
+                       </button>
+                       <button class="btn btn-danger delete-video-btn" data-video-id="${safeVideo.id}">
+                           <i class="fas fa-trash"></i>
+                           Delete
+                       </button>
+                   </div>
+               </div>
+           `;
+           return card;
+       }
+
+       // Filter videos
+       function filterVideos() {
+           const courseFilter = document.getElementById('filter-course').value;
+           const moduleFilter = document.getElementById('filter-module').value;
+           const searchTerm = document.getElementById('search-videos').value.toLowerCase();
+
+           let filteredVideos = videos.filter(video => {
+               return video && 
+                      video.id && 
+                      video.title && 
+                      video.uploadedByAdmin === true;
+           });
+
+           if (courseFilter) {
+               filteredVideos = filteredVideos.filter(video => video.courseId === parseInt(courseFilter));
+           }
+
+           if (moduleFilter) {
+               filteredVideos = filteredVideos.filter(video => video.moduleId === parseInt(moduleFilter));
+           }
+
+           if (searchTerm) {
+               filteredVideos = filteredVideos.filter(video => 
+                   video.title.toLowerCase().includes(searchTerm) ||
+                   (video.description && video.description.toLowerCase().includes(searchTerm))
+               );
+           }
+
+           const grid = document.getElementById('video-grid');
+           grid.innerHTML = '';
+
+           if (filteredVideos.length === 0) {
+               grid.innerHTML = `
+                   <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #666;">
+                       <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 15px; color: #ddd;"></i>
+                       <h3>No Videos Found</h3>
+                       <p>Try adjusting your search filters.</p>
+                   </div>
+               `;
+               return;
+           }
+
+           filteredVideos.forEach(video => {
+               const videoCard = createVideoCard(video);
+               grid.appendChild(videoCard);
+           });
+       }
+
+       // Edit video
+       function editVideo(videoId) {
+           const video = videos.find(v => v.id === videoId && v.uploadedByAdmin === true);
+           if (video) {
+               currentEditingVideo = video;
+               
+               document.getElementById('edit-video-title').value = video.title || '';
+               document.getElementById('edit-video-duration').value = video.duration || '';
+               document.getElementById('edit-video-course').value = video.courseId || '';
+               document.getElementById('edit-video-description').value = video.description || '';
+               document.getElementById('edit-video-order').value = video.order || 1;
+               
+               updateModuleDropdown('edit-video-course', 'edit-video-module');
+               setTimeout(() => {
+                   document.getElementById('edit-video-module').value = video.moduleId || '';
+                   updateLessonDropdown('edit-video-course', 'edit-video-module', 'edit-video-lesson');
+                   setTimeout(() => {
+                       if (video.lessonId) {
+                           document.getElementById('edit-video-lesson').value = video.lessonId;
+                       }
+                   }, 100);
+               }, 100);
+               
+               document.getElementById('edit-video-modal').style.display = 'block';
+           }
+       }
+
+       // Delete video
+       function deleteVideo(videoId) {
+           if (confirm('Are you sure you want to delete this video? This action cannot be undone.')) {
+               try {
+                   const videoToDelete = videos.find(v => v.id === videoId && v.uploadedByAdmin === true);
+                   if (!videoToDelete) {
+                       showUploadNotification('❌ Video not found.', 'error');
+                       return;
+                   }
+                   
+                   // Remove from videos array
+                   videos = videos.filter(v => v.id !== videoId);
+                   
+                   // Clean up localStorage
+                   try {
+                       localStorage.removeItem(`video_data_${videoId}`);
+                   } catch (e) {
+                       console.warn('Error cleaning up localStorage:', e);
+                   }
+                   
+                   // Save updated videos
+                   saveAdminVideos();
+                   
+                   // Clean up user videos
+                   try {
+                       let userVideos = JSON.parse(localStorage.getItem('cybertech_user_videos') || '[]');
+                       userVideos = userVideos.filter(v => v.id !== videoId);
+                       localStorage.setItem('cybertech_user_videos', JSON.stringify(userVideos));
+                   } catch (e) {
+                       console.warn('Error cleaning up user videos:', e);
+                   }
+                   
+                   renderVideoLibrary();
+                   updateStats();
+                   showUploadNotification(`✅ Video "${videoToDelete.title}" deleted successfully.`);
+               } catch (error) {
+                   console.error('Error deleting video:', error);
+                   showUploadNotification('❌ Error deleting video. Please try again.', 'error');
+               }
+           }
+       }
+
+       // Close edit modal
+       function closeEditModal() {
+           document.getElementById('edit-video-modal').style.display = 'none';
+           currentEditingVideo = null;
+       }
+
+       // Play video with persistent storage
+       function playVideo(videoId) {
+           console.log('🎬 playVideo function called with ID:', videoId);
+           
+           const video = videos.find(v => v.id === videoId && v.uploadedByAdmin === true);
+           if (!video) {
+               console.error('Video not found with ID:', videoId);
+               showUploadNotification('❌ Video not found.', 'error');
+               return;
+           }
+           
+           // Increment play count
+           video.plays = (video.plays || 0) + 1;
+           
+           // Update play count in storage
+           try {
+               const videoIndex = videos.findIndex(v => v.id === videoId);
+               if (videoIndex !== -1) {
+                   videos[videoIndex].plays = video.plays;
+                   saveAdminVideos();
+               }
+           } catch (e) {
+               console.warn('Could not update play count:', e);
+           }
+           
+           // Show video modal
+           document.getElementById('video-player-title').textContent = video.title;
+           document.getElementById('video-player-course').textContent = `${video.courseName} > ${video.moduleName} > ${video.lessonName || ''}`;
+           
+           const videoPlayer = document.getElementById('video-player');
+           
+           // Clear previous video
+           videoPlayer.pause();
+           videoPlayer.removeAttribute('src');
+           videoPlayer.load();
+           
+           // Show modal
+           document.getElementById('video-player-modal').style.display = 'flex';
+           
+           // Show loading message
+           showUploadNotification('⏳ Loading video from storage...', 'info');
+           
+           try {
+               let videoUrl = null;
+               
+               // Try to get video from localStorage first
+               const storedVideoData = localStorage.getItem(`video_data_${videoId}`);
+               if (storedVideoData) {
+                   videoUrl = storedVideoData;
+                   console.log('✅ Video loaded from localStorage');
+               }
+               
+               // If not in localStorage, try to load from videos folder
+               if (!videoUrl && video.filePath) {
+                   videoUrl = video.filePath;
+                   console.log('🎥 Attempting to load video from file:', videoUrl);
+               }
+               
+               if (!videoUrl) {
+                   console.error('No video data found for:', video.title);
+                   showUploadNotification(`❌ Video "${video.title}" data not found. Please check the video file exists in the videos folder.`, 'error');
+                   closeVideoPlayer();
+                   return;
+               }
+               
+               // Set video source
+               videoPlayer.src = videoUrl;
+               
+               // Handle successful load
+               videoPlayer.onloadeddata = function() {
+                   console.log('✅ Video loaded successfully:', video.title);
+                   showUploadNotification(`✅ Playing "${video.title}"`, 'success');
+                   
+                   // Ensure video is visible
+                   videoPlayer.style.display = 'block';
+                   videoPlayer.style.width = '100%';
+                   videoPlayer.style.height = 'auto';
+                   
+                   // Update stats
+                   renderVideoLibrary();
+               };
+               
+               // Handle errors
+               videoPlayer.onerror = function(e) {
+                   console.error('❌ Video player error:', e);
+                   showUploadNotification(`❌ Unable to play video "${video.title}". The video data may be corrupted.`, 'error');
+                   closeVideoPlayer();
+               };
+               
+               // Load the video
+               videoPlayer.load();
+               
+           } catch (error) {
+               console.error('Error loading video:', error);
+               showUploadNotification(`❌ Failed to load video "${video.title}".`, 'error');
+               closeVideoPlayer();
+           }
+       }
+
+       // Close video player
+       function closeVideoPlayer() {
+           const videoPlayer = document.getElementById('video-player');
+           if (videoPlayer) {
+               videoPlayer.pause();
+               videoPlayer.removeAttribute('src');
+               videoPlayer.load();
+           }
+           document.getElementById('video-player-modal').style.display = 'none';
+       }
+
+       // Update stats
+       function updateStats() {
+           const totalVideos = videos.length;
+           const totalViews = videos.reduce((sum, video) => sum + (video.views || 0), 0);
+           const totalDuration = videos.reduce((sum, video) => sum + (video.duration || 0), 0);
+           const totalStorage = videos.reduce((sum, video) => sum + (video.fileSize || 0), 0);
+
+           document.getElementById('total-videos').textContent = totalVideos;
+           document.getElementById('total-views').textContent = totalViews.toLocaleString();
+           document.getElementById('total-duration').textContent = totalDuration + ' min';
+           document.getElementById('storage-used').textContent = Math.round(totalStorage) + ' MB';
+       }
+
+       // Refresh dropdowns
+       function refreshDropdowns() {
+           loadCourses();
+           showUploadNotification('✅ Course data refreshed successfully!');
+       }
+
+       // Close modals when clicking outside
+       window.onclick = function(event) {
+           const editModal = document.getElementById('edit-video-modal');
+           const playerModal = document.getElementById('video-player-modal');
+           
+           if (event.target === editModal) {
+               closeEditModal();
+           }
+           if (event.target === playerModal) {
+               closeVideoPlayer();
+           }
+       }
+
+       // Keyboard shortcuts for video player
+       document.addEventListener('keydown', function(event) {
+           const playerModal = document.getElementById('video-player-modal');
+           if (playerModal.style.display === 'flex') {
+               const videoPlayer = document.getElementById('video-player');
+               
+               switch(event.key) {
+                   case ' ': // Spacebar to play/pause
+                       event.preventDefault();
+                       if (videoPlayer.paused) {
+                           videoPlayer.play();
+                       } else {
+                           videoPlayer.pause();
+                       }
+                       break;
+                   case 'Escape': // Escape to close
+                       closeVideoPlayer();
+                       break;
+                   case 'f': // F for fullscreen
+                   case 'F':
+                       if (videoPlayer.requestFullscreen) {
+                           videoPlayer.requestFullscreen();
+                       }
+                       break;
+               }
+           }
+       });
+
+       // Storage usage warning
+       async function checkStorageUsage() {
+           if (navigator.storage && navigator.storage.estimate) {
+               const estimate = await navigator.storage.estimate();
+               const usagePercent = (estimate.usage / estimate.quota) * 100;
+               
+               if (usagePercent > 90) {
+                   showUploadNotification('⚠️ Storage is almost full. Consider deleting old videos.', 'warning');
+               }
+           }
+       }
+
+       // Check storage periodically
+       setInterval(checkStorageUsage, 60000); // Check every minute
+
+   </script>
+</body>
+</html>
